@@ -2,12 +2,12 @@
   <v-container fluid>
     <v-card class="elevation-2">
       <v-card-title class="headline">
-        Program
+        Position
         <v-spacer></v-spacer>
         <v-text-field
           v-model="search"
           prepend-inner-icon="mdi-magnify"
-          label="Search programs"
+          label="Search positions"
           clearable
           outlined
           rounded
@@ -18,26 +18,26 @@
         ></v-text-field>
         <v-btn color="primary" @click="openCreateDialog">
           <v-icon left>mdi-plus</v-icon>
-          Add New Program
+          Add New Position
         </v-btn>
       </v-card-title>
 
       <v-data-table
         :headers="headers"
-        :items="programs"
+        :items="positions"
         :search="search"
         :items-per-page="10"
         class="elevation-1"
         :loading="loading"
-        loading-text="Loading programs... Please wait"
-        no-data-text="No programs found"
+        loading-text="Loading positions... Please wait"
+        no-data-text="No positions found"
         :footer-props="{
           'items-per-page-options': [5, 10, 15, 20],
         }"
       >
         <template v-slot:item="{ item, index }">
           <tr :class="index % 2 === 0 ? 'grey lighten-4' : ''">
-            <td>{{ item.programName }}</td>
+            <td>{{ item.position }}</td>
             <td class="text-right">
               <v-btn icon small class="mr-2" @click="openEditDialog(item)">
                 <v-icon small>mdi-pencil</v-icon>
@@ -62,9 +62,9 @@
             <v-row>
               <v-col cols="12">
                 <v-text-field
-                  v-model="editedItem.programName"
-                  label="Program Name"
-                  :rules="[v => !!v || 'Program name is required']"
+                  v-model="editedItem.position"
+                  label="Position Name"
+                  :rules="[v => !!v || 'Position name is required']"
                   required
                 ></v-text-field>
               </v-col>
@@ -75,19 +75,19 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="blue darken-1" text @click="closeDialog">Cancel</v-btn>
-          <v-btn color="blue darken-1" text @click="saveProgram">Save</v-btn>
+          <v-btn color="blue darken-1" text @click="savePosition">Save</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
 
     <v-dialog v-model="deleteDialog" max-width="500px">
       <v-card>
-        <v-card-title class="headline">Delete Program</v-card-title>
-        <v-card-text>Are you sure you want to delete this program?</v-card-text>
+        <v-card-title class="headline">Delete Position</v-card-title>
+        <v-card-text>Are you sure you want to delete this position?</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="blue darken-1" text @click="closeDeleteDialog">Cancel</v-btn>
-          <v-btn color="red darken-1" text @click="deleteProgram">Delete</v-btn>
+          <v-btn color="red darken-1" text @click="deletePosition">Delete</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -105,7 +105,7 @@
 import { baseURL, currentEnv } from "@/config/baseURL";
 
 export default {
-  name: "ProgramManagementPage",
+  name: "PositionManagementPage",
   data: () => ({
     dialog: false,
     deleteDialog: false,
@@ -115,42 +115,42 @@ export default {
     loading: false,
     search: "",
     headers: [
-      { text: "Program Name", value: "programName", align: 'start', sortable: true },
+      { text: "Position", value: "position", align: 'start', sortable: true },
       { text: "Actions", value: "actions", sortable: false, align: 'end' },
     ],
-    programs: [],
+    positions: [],
     editedIndex: -1,
     editedItem: {
       _id: "",
-      programName: "",
+      position: "",
     },
     defaultItem: {
-      programName: "",
+      position: "",
     },
   }),
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? "New Program" : "Edit Program";
+      return this.editedIndex === -1 ? "New Position" : "Edit Position";
     },
   },
 
   created() {
-    this.fetchPrograms();
+    this.fetchPositions();
     console.log("Current environment:", currentEnv);
     console.log("API Base URL:", baseURL);
   },
 
   methods: {
-    async fetchPrograms() {
+    async fetchPositions() {
       this.loading = true;
       try {
-        const response = await this.$http.get("/program");
+        const response = await this.$http.get("/position");
         console.log(response);
-        this.programs = response.data.data.items;
+        this.positions = response.data.data.items;
       } catch (error) {
-        console.error("Error fetching programs:", error);
-        this.showSnackbar("Error fetching programs", "error");
+        console.error("Error fetching positions:", error);
+        this.showSnackbar("Error fetching positions", "error");
       } finally {
         this.loading = false;
       }
@@ -163,7 +163,7 @@ export default {
     },
 
     openEditDialog(item) {
-      this.editedIndex = this.programs.indexOf(item);
+      this.editedIndex = this.positions.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
@@ -188,42 +188,42 @@ export default {
       });
     },
 
-    async saveProgram() {
-      if (!this.editedItem.programName) {
-        this.showSnackbar("Program name is required", "error");
+    async savePosition() {
+      if (!this.editedItem.position) {
+        this.showSnackbar("Position name is required", "error");
         return;
       }
 
       try {
         if (this.editedIndex > -1) {
-          await this.$http.put(`/program/${this.editedItem._id}`, this.editedItem);
-          Object.assign(this.programs[this.editedIndex], this.editedItem);
-          this.showSnackbar("Program updated successfully", "success");
+          await this.$http.put(`/position/${this.editedItem._id}`, this.editedItem);
+          Object.assign(this.positions[this.editedIndex], this.editedItem);
+          this.showSnackbar("Position updated successfully", "success");
         } else {
-          const response = await this.$http.post("/program", this.editedItem);
+          const response = await this.$http.post("/position", this.editedItem);
           console.log(response);
-          this.programs.push(response.data.data.item);
-          this.showSnackbar("Program created successfully", "success");
+          this.positions.push(response.data.data.item);
+          this.showSnackbar("Position created successfully", "success");
         }
         this.closeDialog();
       } catch (error) {
-        console.error("Error saving program:", error);
-        this.showSnackbar("Error saving program", "error");
+        console.error("Error saving position:", error);
+        this.showSnackbar("Error saving position", "error");
       }
     },
 
-    async deleteProgram() {
+    async deletePosition() {
       try {
-        await this.$http.delete(`/program/${this.editedItem._id}`);
-        const index = this.programs.findIndex(
-          (program) => program._id === this.editedItem._id
+        await this.$http.delete(`/position/${this.editedItem._id}`);
+        const index = this.positions.findIndex(
+          (position) => position._id === this.editedItem._id
         );
-        this.programs.splice(index, 1);
+        this.positions.splice(index, 1);
         this.closeDeleteDialog();
-        this.showSnackbar("Program deleted successfully", "success");
+        this.showSnackbar("Position deleted successfully", "success");
       } catch (error) {
-        console.error("Error deleting program:", error);
-        this.showSnackbar("Error deleting program", "error");
+        console.error("Error deleting position:", error);
+        this.showSnackbar("Error deleting position", "error");
       }
     },
 

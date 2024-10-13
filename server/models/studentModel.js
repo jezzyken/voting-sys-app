@@ -6,10 +6,11 @@ const studentSchema = new mongoose.Schema(
   {
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    middleName: { type: String, required: true },
+    LRN: { type: String, required: true },
     role: { type: String, default: "student" },
-    yearLevel: { type: Number, required: true },
+    section:  { type: String, required: true },
+    yearLevel: { type: String, required: true },
     programId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Program",

@@ -26,6 +26,31 @@ const routes = [
     component: () => import('../views/Programs.vue'),
   },
   {
+    path: '/students',
+    name: 'Students',
+    component: () => import('../views/Students.vue'),
+  },
+  {
+    path: '/positions',
+    name: 'Positions',
+    component: () => import('../views/Positions.vue'),
+  },
+  {
+    path: '/elections',
+    name: 'Elections',
+    component: () => import('../views/Elections.vue'),
+  },
+  {
+    path: '/candidates',
+    name: 'Candidates',
+    component: () => import('../views/Candidates.vue'),
+  },
+  {
+    path: '/votes',
+    name: 'Votes',
+    component: () => import('../views/Votes.vue'),
+  },
+  {
     path: "/settings",
     name: "Settings",
     component: () => import("../views/Settings.vue"),

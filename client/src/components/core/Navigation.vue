@@ -123,6 +123,11 @@ export default {
         },
         { title: "Settings", path: "/settings", icon: "mdi-cog" },
         { title: "Programs", path: "/programs", icon: "mdi-cog" },
+        { title: "Students", path: "/students", icon: "mdi-cog" },
+        { title: "Positions", path: "/positions", icon: "mdi-cog" },
+        { title: "Elections", path: "/elections", icon: "mdi-cog" },
+        { title: "Candidates", path: "/candidates", icon: "mdi-cog" },
+        { title: "Votes", path: "/votes", icon: "mdi-cog" },
       ];
     },
   },

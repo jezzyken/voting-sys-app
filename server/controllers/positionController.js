@@ -1,4 +1,4 @@
-const SERVICE = require('../services/candidateService');
+const SERVICE = require('../services/positionService');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
@@ -16,7 +16,7 @@ const getAll = catchAsync(async (req, res, next) => {
 const getById = catchAsync(async (req, res, next) => {
     const item = await SERVICE.getById(req.params.id);
     if (!item) {
-        return next(new AppError('Candidate not found', 404));
+        return next(new AppError('Vote not found', 404));
     }
     res.status(200).json({
         status: 'success',
@@ -27,9 +27,7 @@ const getById = catchAsync(async (req, res, next) => {
 });
 
 const add = catchAsync(async (req, res, next) => {
-    const candidateData = req.body;
-    const imageFile = req.file;
-    const newItem = await SERVICE.add(candidateData, imageFile);
+    const newItem = await SERVICE.add(req.body);
     res.status(201).json({
         status: 'success',
         data: {
@@ -41,7 +39,7 @@ const add = catchAsync(async (req, res, next) => {
 const update = catchAsync(async (req, res, next) => {
     const updatedItem = await SERVICE.update(req.params.id, req.body);
     if (!updatedItem) {
-        return next(new AppError('Candidate not found', 404));
+        return next(new AppError('Vote not found', 404));
     }
     res.status(200).json({
         status: 'success',
@@ -54,7 +52,7 @@ const update = catchAsync(async (req, res, next) => {
 const remove = catchAsync(async (req, res, next) => {
     const deletedItem = await SERVICE.remove(req.params.id);
     if (!deletedItem) {
-        return next(new AppError('Candidate not found', 404));
+        return next(new AppError('Vote not found', 404));
     }
     res.status(204).json({
         status: 'success',

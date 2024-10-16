@@ -10,10 +10,10 @@
   >
     <v-list-item class="px-2">
       <v-list-item-avatar>
-        <v-img src="https://randomuser.me/api/portraits/men/85.jpg"></v-img>
+        <v-img src="https://lh3.googleusercontent.com/a/ACg8ocLdHlNO2csW9twKE8giqa_NnbUqNvbNCj1neZUr1IH7WbvanFI=s83-c-mo"></v-img>
       </v-list-item-avatar>
 
-      <v-list-item-title class="text-h6">John Doe</v-list-item-title>
+      <v-list-item-title class="text-h6">KenJS</v-list-item-title>
 
       <v-btn icon @click.stop="toggleMini">
         <v-icon>{{ mini ? "mdi-chevron-right" : "mdi-chevron-left" }}</v-icon>

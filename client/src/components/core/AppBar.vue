@@ -22,7 +22,7 @@
           v-on="on"
         >
           <v-avatar size="36">
-            <v-img src="https://randomuser.me/api/portraits/men/85.jpg"></v-img>
+            <v-img src="https://lh3.googleusercontent.com/a/ACg8ocLdHlNO2csW9twKE8giqa_NnbUqNvbNCj1neZUr1IH7WbvanFI=s83-c-mo"></v-img>
           </v-avatar>
         </v-btn>
       </template>

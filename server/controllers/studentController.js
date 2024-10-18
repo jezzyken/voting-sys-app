@@ -86,9 +86,9 @@ const initiateLogin = catchAsync(async (req, res, next) => {
 });
 
 const verifyOTP = catchAsync(async (req, res, next) => {
-  const { studentId, email } = req.body;
+  const { studentId, otp } = req.body;
 
-  const result = await SERVICE.verifyOTP(studentId, email);
+  const result = await SERVICE.verifyOTP(studentId, otp);
 
   if (result.status === "error") {
     return next(new AppError(result.message, 400));

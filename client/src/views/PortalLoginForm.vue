@@ -95,6 +95,8 @@
 </template>
 
 <script>
+import { mapActions } from "vuex";
+
 export default {
   data: () => ({
     studentId: "",
@@ -102,23 +104,36 @@ export default {
     otp: "",
     showOtp: false,
     loading: false,
+    error: "",
   }),
   methods: {
-    submitLogin() {
+    ...mapActions("student", ["login"]),
+    async submitLogin() {
       this.loading = true;
-      if (!this.showOtp) {
-        setTimeout(() => {
-          this.showOtp = true;
-          this.loading = false;
-          this.$root.$emit("show-snackbar", "OTP sent to your email");
-        }, 1500);
-      } else {
-        setTimeout(() => {
-          this.loading = false;
-          this.showOtp = false;
-          this.$root.$emit("show-snackbar", "Login successful");
-          this.$router.push("/election/portal");
-        }, 1500);
+      this.error = "";
+
+      try {
+        const result = await this.login({
+          studentId: this.studentId,
+          email: this.email,
+          otp: this.showOtp ? this.otp : null,
+        });
+        if (result.error) {
+          this.error = result.error;
+          if (this.error === "OTP has expired") {
+            this.showOtp = false;
+            this.otp = "";
+          }
+        } else {
+          this.$root.$emit("show-snackbar", result.message);
+          if (result.showOtp) {
+            this.showOtp = true;
+          } else {
+            this.$router.push("/election/portal");
+          }
+        }
+      } finally {
+        this.loading = false;
       }
     },
   },

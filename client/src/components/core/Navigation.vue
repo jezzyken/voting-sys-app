@@ -103,7 +103,7 @@ export default {
         { title: "Candidates", path: "/candidates", icon: "mdi-cog" },
         { title: "Party", path: "/party", icon: "mdi-cog" },
         { title: "Classroom", path: "/classroom", icon: "mdi-cog" },
-        { title: "Election Page", path: "//election/view", icon: "mdi-cog" },
+        { title: "Election Page", path: "/election/view", icon: "mdi-cog" },
         {
           title: "Users",
           icon: "mdi-account-group",

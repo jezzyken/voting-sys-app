@@ -21,6 +21,8 @@ const studentSchema = new mongoose.Schema(
       required: true,
     },
     status: { type: String, enum: ["active", "inactive"], default: "active" },
+    otp: { type: String },
+    otpExpires: { type: Date },
   },
   { timestamps: true }
 );

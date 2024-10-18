@@ -21,14 +21,14 @@
           >Candidates</v-btn
         >
         <v-btn text @click="scrollTo('events')" class="text-capitalize"
-          >Events</v-btn
+          >Elections</v-btn
         >
         <v-btn
           color="primary darken-1"
           class="ml-4"
-          :to="{ path: '/portal/login' }"
+          :to="isLoggedIn ? '/election/portal' : '/portal/login'"
         >
-          Enter Portal
+          {{ isLoggedIn ? "Enter Portal" : "Login" }}
         </v-btn>
       </v-container>
     </v-app-bar>
@@ -49,9 +49,9 @@
                 x-large
                 elevation="2"
                 class="px-8"
-                :to="{ path: '/portal/login' }"
+                :to="isLoggedIn ? '/election/portal' : '/portal/login'"
               >
-                Enter Voting Portal
+                {{ isLoggedIn ? "Enter Voting Portal" : "Login to Vote" }}
               </v-btn>
             </v-col>
           </v-row>
@@ -118,7 +118,7 @@
 
         <section id="events" class="py-16">
           <h2 class="text-h3 font-weight-bold mb-6 primary--text">
-            Upcoming Events
+            Upcoming Elections
           </h2>
           <v-timeline align-top dense>
             <v-timeline-item
@@ -179,6 +179,8 @@
 
 <script>
 import moment from "moment";
+import { mapGetters } from "vuex";
+
 export default {
   data: () => ({
     isScrolled: false,
@@ -192,6 +194,9 @@ export default {
     snackbar: false,
     snackbarText: "",
   }),
+  computed: {
+    ...mapGetters("student", ["isLoggedIn"]),
+  },
   mounted() {
     window.addEventListener("scroll", this.handleScroll);
     this.fetchElectionData();

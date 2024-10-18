@@ -14,7 +14,7 @@ router
 
   //Autg
   router.post("/initiate-login", CONTROLLER.initiateLogin);
-  router.post("/verify-otp", CONTROLLER.initiateLogin);
+  router.post("/verify-otp", CONTROLLER.verifyOTP);
 
 
 module.exports = router;

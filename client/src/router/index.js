@@ -1,5 +1,6 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
+import store from '../store'
 
 // Import layouts
 import MainLayout from "../MainLayout.vue";
@@ -122,7 +123,6 @@ const routes = [
       },
     ],
   },
-
 ];
 
 const router = new VueRouter({
@@ -130,5 +130,21 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes,
 });
+
+
+router.beforeEach(async (to, from, next) => {
+  if (!store.getters['student/isInitialized']) {
+    await store.dispatch('student/initializeApp')
+  }
+  const isLoggedIn = store.getters['student/isLoggedIn']
+  if (to.path.startsWith('/election/portal') && !isLoggedIn) {
+    next('/portal/login')
+  } else if (to.path === '/portal/login' && isLoggedIn) {
+    next('/election/portal')
+  } else {
+    next()
+  }
+})
+
 
 export default router;

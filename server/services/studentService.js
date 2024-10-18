@@ -58,7 +58,9 @@ const initiateLogin = async (studentId, email) => {
 };
 
 const verifyOTP = async (studentId, otp) => {
+  console.log(studentId, otp)
   const student = await MODEL.findOne({ StudentIdNo: studentId });
+  console.log(student)
 
   if (!student) {
     return { status: "error", message: "Student not found" };

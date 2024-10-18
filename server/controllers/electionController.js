@@ -26,6 +26,30 @@ const getById = catchAsync(async (req, res, next) => {
     });
 });
 
+
+const getOngoingElectionCandidates = catchAsync(async (req, res, next) => {
+    const items = await SERVICE.getOngoingElectionCandidates();
+    res.status(200).json({
+        status: 'success',
+        results: items.length,
+        data: {
+            items
+        }
+    });
+});
+
+const getUpcomingEvents = catchAsync(async (req, res, next) => {
+    const items = await SERVICE.getUpcomingEvents();
+    res.status(200).json({
+        status: 'success',
+        results: items.length,
+        data: {
+            items
+        }
+    });
+});
+
+
 const add = catchAsync(async (req, res, next) => {
     const newItem = await SERVICE.add(req.body);
     res.status(201).json({
@@ -63,6 +87,8 @@ const remove = catchAsync(async (req, res, next) => {
 module.exports = {
     getAll,
     getById,
+    getOngoingElectionCandidates,
+    getUpcomingEvents,
     add,
     update,
     remove,

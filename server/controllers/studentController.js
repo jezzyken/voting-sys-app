@@ -3,7 +3,7 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 
 const getAll = catchAsync(async (req, res, next) => {
-    console.log('get')
+  console.log("get");
 
   const items = await SERVICE.getAll();
   res.status(200).json({
@@ -16,7 +16,7 @@ const getAll = catchAsync(async (req, res, next) => {
 });
 
 const getById = catchAsync(async (req, res, next) => {
-    console.log('get id')
+  console.log("get id");
 
   const item = await SERVICE.getById(req.params.id);
   if (!item) {
@@ -73,6 +73,30 @@ const search = catchAsync(async (req, res, next) => {
   }
 });
 
+const initiateLogin = catchAsync(async (req, res, next) => {
+  const { studentId, email } = req.body;
+
+  const result = await SERVICE.initiateLogin(studentId, email);
+
+  if (result.status === "error") {
+    return next(new AppError(result.message, 400));
+  }
+
+  res.status(200).json(result);
+});
+
+const verifyOTP = catchAsync(async (req, res, next) => {
+  const { studentId, email } = req.body;
+
+  const result = await SERVICE.verifyOTP(studentId, email);
+
+  if (result.status === "error") {
+    return next(new AppError(result.message, 400));
+  }
+
+  res.status(200).json(result);
+});
+
 module.exports = {
   getAll,
   getById,
@@ -80,4 +104,6 @@ module.exports = {
   update,
   remove,
   search,
+  initiateLogin,
+  verifyOTP,
 };

@@ -10,7 +10,9 @@
   >
     <v-list-item class="px-2">
       <v-list-item-avatar>
-        <v-img src="https://lh3.googleusercontent.com/a/ACg8ocLdHlNO2csW9twKE8giqa_NnbUqNvbNCj1neZUr1IH7WbvanFI=s83-c-mo"></v-img>
+        <v-img
+          src="https://lh3.googleusercontent.com/a/ACg8ocLdHlNO2csW9twKE8giqa_NnbUqNvbNCj1neZUr1IH7WbvanFI=s83-c-mo"
+        ></v-img>
       </v-list-item-avatar>
 
       <v-list-item-title class="text-h6">KenJS</v-list-item-title>
@@ -93,6 +95,15 @@ export default {
     menuItems() {
       return [
         { title: "Dashboard", path: "/", icon: "mdi-view-dashboard" },
+
+        { title: "Programs", path: "/programs", icon: "mdi-cog" },
+        { title: "Students", path: "/students", icon: "mdi-cog" },
+        // { title: "Positions", path: "/positions", icon: "mdi-cog" },
+        { title: "Elections", path: "/elections", icon: "mdi-cog" },
+        { title: "Candidates", path: "/candidates", icon: "mdi-cog" },
+        { title: "Party", path: "/party", icon: "mdi-cog" },
+        { title: "Classroom", path: "/classroom", icon: "mdi-cog" },
+        { title: "Election Page", path: "//election/view", icon: "mdi-cog" },
         {
           title: "Users",
           icon: "mdi-account-group",
@@ -121,13 +132,6 @@ export default {
             },
           ],
         },
-        { title: "Settings", path: "/settings", icon: "mdi-cog" },
-        { title: "Programs", path: "/programs", icon: "mdi-cog" },
-        { title: "Students", path: "/students", icon: "mdi-cog" },
-        { title: "Positions", path: "/positions", icon: "mdi-cog" },
-        { title: "Elections", path: "/elections", icon: "mdi-cog" },
-        { title: "Candidates", path: "/candidates", icon: "mdi-cog" },
-        { title: "Votes", path: "/votes", icon: "mdi-cog" },
       ];
     },
   },
@@ -160,7 +164,6 @@ export default {
 
 .active-group > .v-list-group__header {
   background-color: rgba(255, 255, 0, 0.1) !important;
-
 }
 
 .active-group > .v-list-group__header .v-list-item__icon,

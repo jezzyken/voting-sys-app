@@ -1,12 +1,5 @@
 <template>
-  <div>
+  <div class="ma-4">
     <h1>Dashboard</h1>
-    <!-- Add dashboard content here -->
   </div>
 </template>
-
-<script>
-export default {
-  name: 'Dashboard',
-};
-</script>

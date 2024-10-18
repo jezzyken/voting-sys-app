@@ -12,4 +12,9 @@ router
   .put(CONTROLLER.update)
   .delete(CONTROLLER.remove);
 
+  //Autg
+  router.post("/initiate-login", CONTROLLER.initiateLogin);
+  router.post("/verify-otp", CONTROLLER.initiateLogin);
+
+
 module.exports = router;

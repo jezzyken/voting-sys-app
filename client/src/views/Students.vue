@@ -32,7 +32,6 @@
         loading-text="Loading students... Please wait"
         no-data-text="No students found"
       >
-
         <template v-slot:item.status="{ item }">
           <v-chip
             :color="item.status === 'active' ? 'green' : 'red'"
@@ -63,10 +62,10 @@
         <v-card-text>
           <v-container>
             <v-row>
-                <v-col cols="12" sm="6">
-                  <v-text-field v-model="editedItem.LRN" label="LRN" required></v-text-field>
-                </v-col>
-              </v-row>
+              <v-col cols="12" sm="6">
+                <v-text-field v-model="editedItem.StudentIdNo" label="StudentIdNo" required></v-text-field>
+              </v-col>
+            </v-row>
             <v-row>
               <v-col cols="12" sm="4">
                 <v-text-field v-model="editedItem.firstName" label="First Name" required></v-text-field>
@@ -85,6 +84,9 @@
               </v-col>
               <v-col cols="12" sm="4">
                 <v-select v-model="editedItem.programId" :items="programs" item-text="programName" item-value="_id" label="Program" required></v-select>
+              </v-col>
+              <v-col cols="12" sm="4">
+                <v-select v-model="editedItem.classroomId" :items="classrooms" item-text="name" item-value="_id" label="Classroom" required></v-select>
               </v-col>
               <v-col cols="12" sm="4">
                 <v-select v-model="editedItem.status" :items="['active', 'inactive']" label="Status" required></v-select>
@@ -135,38 +137,42 @@ export default {
     search: "",
     showPassword: false,
     headers: [
-      { text: "LRN", value: "LRN" },
+      { text: "Student ID", value: "StudentIdNo" },
       { text: "First Name", value: "firstName" },
       { text: "Middle Name", value: "middleName" },
       { text: "Last Name", value: "lastName" },
       { text: "Section", value: "section" },
       { text: "Year Level", value: "yearLevel" },
       { text: "Program", value: "programId.programName" },
+      { text: "Classroom", value: "classroomId.name" },
       { text: "Status", value: "status" },
       { text: "Actions", value: "actions", sortable: false },
     ],
     students: [],
     programs: [],
+    classrooms: [],
     editedIndex: -1,
     editedItem: {
       _id: "",
-      LRN: "",
+      StudentIdNo: "",
       firstName: "",
       middleName: "",
       lastName: "",
       section: "",
       yearLevel: null,
       programId: null,
+      classroomId: null,
       status: "active",
     },
     defaultItem: {
-      LRN: "",
+      StudentIdNo: "",
       firstName: "",
       middleName: "",
       lastName: "",
       section: "",
       yearLevel: null,
       programId: null,
+      classroomId: null,
       status: "active",
     },
   }),
@@ -180,6 +186,7 @@ export default {
   created() {
     this.fetchStudents();
     this.fetchPrograms();
+    this.fetchClassrooms();
   },
 
   methods: {
@@ -203,6 +210,16 @@ export default {
       } catch (error) {
         console.error("Error fetching programs:", error);
         this.showSnackbar("Error fetching programs", "error");
+      }
+    },
+
+    async fetchClassrooms() {
+      try {
+        const response = await this.$http.get("/classroom");
+        this.classrooms = response.data.data.items;
+      } catch (error) {
+        console.error("Error fetching classrooms:", error);
+        this.showSnackbar("Error fetching classrooms", "error");
       }
     },
 

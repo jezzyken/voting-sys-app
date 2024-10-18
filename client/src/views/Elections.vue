@@ -135,24 +135,29 @@
                   deletable-chips
                 ></v-combobox>
               </v-col>
-              <v-col cols="6">
+              <v-col cols="12">
                 <v-select
                   v-model="editedItem.electionType"
                   :items="['SSC', 'Classroom']"
                   label="Election Type"
                   required
+                  @change="handleElectionTypeChange"
                 ></v-select>
               </v-col>
-              <v-col cols="6">
-                <v-text-field
-                  v-model="editedItem.scope"
-                  label="Scope"
-                ></v-text-field>
+              <v-col cols="12" v-if="editedItem.electionType === 'Classroom'">
+                <v-select
+                  v-model="editedItem.classroomId"
+                  :items="classrooms"
+                  item-text="name"
+                  item-value="_id"
+                  label="Classroom"
+                  required
+                ></v-select>
               </v-col>
               <v-col cols="12">
                 <v-select
                   v-model="editedItem.status"
-                  :items="['pending', 'ongoing', 'completed']"
+                  :items="['upcoming', 'ongoing', 'completed']"
                   label="Status"
                   required
                 ></v-select>
@@ -221,6 +226,7 @@ export default {
     ],
     elections: [],
     editedIndex: -1,
+    classrooms: [],
     editedItem: {
       _id: "",
       name: "",
@@ -228,8 +234,8 @@ export default {
       endDate: "",
       positions: [],
       electionType: "",
-      scope: "",
-      status: "pending",
+      classroomId: null,
+      status: "upcoming",
     },
     defaultItem: {
       name: "",
@@ -237,8 +243,8 @@ export default {
       endDate: "",
       positions: [],
       electionType: "",
-      scope: "",
-      status: "pending",
+      classroomId: null,
+      status: "upcoming",
     },
   }),
 
@@ -250,11 +256,26 @@ export default {
 
   created() {
     this.fetchElections();
-    console.log("Current environment:", currentEnv);
-    console.log("API Base URL:", baseURL);
+    this.fetchClassrooms();
   },
 
   methods: {
+    async fetchClassrooms() {
+      try {
+        const response = await this.$http.get("/classroom");
+        this.classrooms = response.data.data.items;
+      } catch (error) {
+        console.error("Error fetching classrooms:", error);
+        this.showSnackbar("Error fetching classrooms", "error");
+      }
+    },
+
+    handleElectionTypeChange() {
+      if (this.editedItem.electionType !== "Classroom") {
+        this.editedItem.classroomId = null;
+      }
+    },
+
     async fetchElections() {
       this.loading = true;
       try {
@@ -363,6 +384,16 @@ export default {
       }
       if (!this.editedItem.electionType) {
         this.showSnackbar("Election type is required", "error");
+        return false;
+      }
+      if (
+        this.editedItem.electionType === "Classroom" &&
+        !this.editedItem.classroomId
+      ) {
+        this.showSnackbar(
+          "Classroom is required for Classroom elections",
+          "error"
+        );
         return false;
       }
       if (

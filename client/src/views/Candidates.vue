@@ -150,7 +150,6 @@
       </v-card>
     </v-dialog>
 
-    <!-- Delete Confirmation Dialog -->
     <v-dialog v-model="deleteDialog" max-width="500px">
       <v-card>
         <v-card-title class="headline">Delete Candidate</v-card-title>
@@ -169,7 +168,6 @@
       </v-card>
     </v-dialog>
 
-    <!-- Snackbar for notifications -->
     <v-snackbar v-model="snackbar" :color="snackbarColor" :timeout="3000">
       {{ snackbarText }}
       <template v-slot:action="{ attrs }">

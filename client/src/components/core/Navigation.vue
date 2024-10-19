@@ -95,14 +95,13 @@ export default {
     menuItems() {
       return [
         { title: "Dashboard", path: "/", icon: "mdi-view-dashboard" },
-
+        { title: "Classroom", path: "/classroom", icon: "mdi-cog" },
         { title: "Programs", path: "/programs", icon: "mdi-cog" },
         { title: "Students", path: "/students", icon: "mdi-cog" },
         // { title: "Positions", path: "/positions", icon: "mdi-cog" },
+        { title: "Party", path: "/party", icon: "mdi-cog" },
         { title: "Elections", path: "/elections", icon: "mdi-cog" },
         { title: "Candidates", path: "/candidates", icon: "mdi-cog" },
-        { title: "Party", path: "/party", icon: "mdi-cog" },
-        { title: "Classroom", path: "/classroom", icon: "mdi-cog" },
         { title: "Election Page", path: "/election/view", icon: "mdi-cog" },
         {
           title: "Users",

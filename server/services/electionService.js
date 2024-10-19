@@ -64,12 +64,13 @@ const getOngoingElectionCandidates = async () => {
         candidateManifesto: "$candidates.manifesto",
         candidateImageUrl: "$candidates.imageUrl",
         candidateYearLevel: "$candidateInfo.yearLevel",
-        candidateSection: "$candidateInfo.section",
       },
     },
   ];
 
-  return await MODEL.aggregate(pipeline);
+  const results = await MODEL.aggregate(pipeline);
+
+  return results
 };
 
 const getUpcomingEvents = async () => {

@@ -11,18 +11,15 @@
     <v-btn icon>
       <v-icon>mdi-bell</v-icon>
     </v-btn>
-    <v-menu
-      left
-      bottom
-    >
+    <v-menu left bottom>
       <template v-slot:activator="{ on, attrs }">
-        <v-btn
-          icon
-          v-bind="attrs"
-          v-on="on"
-        >
-          <v-avatar size="36">
+        <v-btn icon v-bind="attrs" v-on="on">
+          <!-- <v-avatar size="36">
             <v-img src="https://lh3.googleusercontent.com/a/ACg8ocLdHlNO2csW9twKE8giqa_NnbUqNvbNCj1neZUr1IH7WbvanFI=s83-c-mo"></v-img>
+          </v-avatar> -->
+
+          <v-avatar color="primary" size="32">
+            <span class="white--text text-caption">GV</span>
           </v-avatar>
         </v-btn>
       </template>
@@ -41,31 +38,31 @@
 </template>
 
 <script>
-import { mapMutations } from 'vuex';
+import { mapMutations } from "vuex";
 
 export default {
-  name: 'AppBar',
+  name: "AppBar",
   data() {
     return {
       userMenuItems: [
-        { title: 'Profile', action: this.goToProfile },
-        { title: 'Settings', action: this.goToSettings },
-        { title: 'Logout', action: this.logout },
+        { title: "Profile", action: this.goToProfile },
+        { title: "Settings", action: this.goToSettings },
+        { title: "Logout", action: this.logout },
       ],
     };
   },
   computed: {
     currentPageTitle() {
-      return this.$route.name || 'Dashboard';
+      return this.$route.name || "Dashboard";
     },
   },
   methods: {
-    ...mapMutations('app', ['toggleMini']),
+    ...mapMutations("app", ["toggleMini"]),
     goToProfile() {
       // Implement profile navigation
     },
     goToSettings() {
-      this.$router.push('/settings');
+      this.$router.push("/settings");
     },
     logout() {
       // Implement logout functionality

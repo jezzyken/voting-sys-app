@@ -9,7 +9,6 @@
               <div class="text-center pa-5">
                 <v-icon size="64" color="white">mdi-shield-account</v-icon>
                 <h2 class="white--text mt-4">Admin Portal</h2>
-                <p class="white--text mt-2">Secure access to your dashboard</p>
               </div>
             </v-col>
             <v-col cols="12" md="7">

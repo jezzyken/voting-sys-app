@@ -72,6 +72,11 @@ const routes = [
         component: () => import("../views/Classroom.vue"),
       },
       {
+        path: "/candidates-list/:id",
+        name: "Candidate Lists",
+        component: () => import("../views/CandidatesListPage.vue"),
+      },
+      {
         path: "settings",
         name: "Settings",
         component: () => import("../views/Settings.vue"),

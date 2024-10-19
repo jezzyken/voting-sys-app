@@ -9,8 +9,9 @@ const studentSchema = new mongoose.Schema(
     middleName: { type: String, required: true },
     StudentIdNo: { type: String, required: true },
     role: { type: String, default: "student" },
-    section: { type: String, required: true },
     yearLevel: { type: String, required: true },
+    gender: { type: String, required: true },
+    email: { type: String, required: true },
     classroomId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Classroom",

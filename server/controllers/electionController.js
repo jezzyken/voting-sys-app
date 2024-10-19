@@ -38,6 +38,7 @@ const getOngoingElectionCandidates = catchAsync(async (req, res, next) => {
     });
 });
 
+
 const getUpcomingEvents = catchAsync(async (req, res, next) => {
     const items = await SERVICE.getUpcomingEvents();
     res.status(200).json({

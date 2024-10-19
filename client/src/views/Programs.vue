@@ -14,7 +14,7 @@
           dense
           hide-details
           class="mr-4"
-          style="max-width: 300px;"
+          style="max-width: 300px"
         ></v-text-field>
         <v-btn color="primary" @click="openCreateDialog">
           <v-icon left>mdi-plus</v-icon>
@@ -38,6 +38,7 @@
         <template v-slot:item="{ item, index }">
           <tr :class="index % 2 === 0 ? 'grey lighten-4' : ''">
             <td>{{ item.programName }}</td>
+            <td>{{ item.programAbr }}</td>
             <td class="text-right">
               <v-btn icon small class="mr-2" @click="openEditDialog(item)">
                 <v-icon small>mdi-pencil</v-icon>
@@ -64,7 +65,15 @@
                 <v-text-field
                   v-model="editedItem.programName"
                   label="Program Name"
-                  :rules="[v => !!v || 'Program name is required']"
+                  :rules="[(v) => !!v || 'Program name is required']"
+                  required
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12">
+                <v-text-field
+                  v-model="editedItem.programAbr"
+                  label="Program Abbreviation"
+                  :rules="[(v) => !!v || 'Program Abbreviation is required']"
                   required
                 ></v-text-field>
               </v-col>
@@ -86,7 +95,9 @@
         <v-card-text>Are you sure you want to delete this program?</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="closeDeleteDialog">Cancel</v-btn>
+          <v-btn color="blue darken-1" text @click="closeDeleteDialog"
+            >Cancel</v-btn
+          >
           <v-btn color="red darken-1" text @click="deleteProgram">Delete</v-btn>
         </v-card-actions>
       </v-card>
@@ -115,17 +126,30 @@ export default {
     loading: false,
     search: "",
     headers: [
-      { text: "Program Name", value: "programName", align: 'start', sortable: true },
-      { text: "Actions", value: "actions", sortable: false, align: 'end' },
+      {
+        text: "Program Name",
+        value: "programName",
+        align: "start",
+        sortable: true,
+      },
+      {
+        text: "Abbreviation",
+        value: "programAbr",
+        align: "start",
+        sortable: true,
+      },
+      { text: "Actions", value: "actions", sortable: false, align: "end" },
     ],
     programs: [],
     editedIndex: -1,
     editedItem: {
       _id: "",
       programName: "",
+      programAbr: "",
     },
     defaultItem: {
       programName: "",
+      programAbr: "",
     },
   }),
 
@@ -196,7 +220,10 @@ export default {
 
       try {
         if (this.editedIndex > -1) {
-          await this.$http.put(`/program/${this.editedItem._id}`, this.editedItem);
+          await this.$http.put(
+            `/program/${this.editedItem._id}`,
+            this.editedItem
+          );
           Object.assign(this.programs[this.editedIndex], this.editedItem);
           this.showSnackbar("Program updated successfully", "success");
         } else {

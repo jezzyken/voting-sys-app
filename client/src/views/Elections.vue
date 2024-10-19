@@ -37,6 +37,15 @@
       >
         <template v-slot:item="{ item, index }">
           <tr :class="index % 2 === 0 ? 'grey lighten-4' : ''">
+            <td>
+              <v-btn
+                x-small
+                color="primary"
+                @click="goToCandidatesList(item._id)"
+              >
+                Select
+              </v-btn>
+            </td>
             <td>{{ item.name }}</td>
             <td>{{ formatDate(item.startDate) }}</td>
             <td>{{ formatDate(item.endDate) }}</td>
@@ -217,12 +226,13 @@ export default {
     startDateMenu: false,
     endDateMenu: false,
     headers: [
+      { text: "Select", value: "actions", sortable: false, align: "start" },
       { text: "Election Name", value: "name", align: "start", sortable: true },
       { text: "Start Date", value: "startDate", sortable: true },
       { text: "End Date", value: "endDate", sortable: true },
       { text: "Type", value: "electionType", sortable: true },
       { text: "Status", value: "status", sortable: true },
-      { text: "Actions", value: "actions", sortable: false, align: "end" },
+      { text: "Actions", value: "editDelete", sortable: false, align: "end" },
     ],
     elections: [],
     editedIndex: -1,
@@ -403,6 +413,13 @@ export default {
         return false;
       }
       return true;
+    },
+
+    goToCandidatesList(electionId) {
+      this.$router.push({
+        name: "Candidate Lists",
+        params: { id: electionId },
+      });
     },
 
     formatDate(date) {

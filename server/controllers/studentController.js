@@ -16,8 +16,6 @@ const getAll = catchAsync(async (req, res, next) => {
 });
 
 const getById = catchAsync(async (req, res, next) => {
-  console.log("get id");
-
   const item = await SERVICE.getById(req.params.id);
   if (!item) {
     return next(new AppError("Student not found", 404));

@@ -26,6 +26,17 @@ const getById = catchAsync(async (req, res, next) => {
     });
 });
 
+const getByElectionId = catchAsync(async (req, res, next) => {
+    const items = await SERVICE.getByElectionId(req);
+    res.status(200).json({
+        status: 'success',
+        results: items.length,
+        data: {
+            items
+        }
+    });
+});
+
 const add = catchAsync(async (req, res, next) => {
     const candidateData = req.body;
     const imageFile = req.file;
@@ -65,6 +76,7 @@ const remove = catchAsync(async (req, res, next) => {
 module.exports = {
     getAll,
     getById,
+    getByElectionId,
     add,
     update,
     remove,

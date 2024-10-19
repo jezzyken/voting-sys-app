@@ -14,7 +14,7 @@
           hide-details
           class="mr-4"
           rounded
-          style="max-width: 300px;"
+          style="max-width: 300px"
         ></v-text-field>
         <v-btn color="primary" @click="openCreateDialog">
           <v-icon left>mdi-plus</v-icon>
@@ -53,7 +53,7 @@
       </v-data-table>
     </v-card>
 
-    <v-dialog v-model="dialog" max-width="800px">
+    <v-dialog v-model="dialog" max-width="900px">
       <v-card>
         <v-card-title>
           <span class="headline">{{ formTitle }}</span>
@@ -62,34 +62,86 @@
         <v-card-text>
           <v-container>
             <v-row>
-              <v-col cols="12" sm="6">
-                <v-text-field v-model="editedItem.StudentIdNo" label="StudentIdNo" required></v-text-field>
+              <v-col cols="12" sm="12" md="4">
+                <v-text-field
+                  v-model="editedItem.StudentIdNo"
+                  label="Student ID"
+                  required
+                ></v-text-field>
               </v-col>
             </v-row>
             <v-row>
-              <v-col cols="12" sm="4">
-                <v-text-field v-model="editedItem.firstName" label="First Name" required></v-text-field>
+              <v-col cols="12" sm="6" md="4">
+                <v-text-field
+                  v-model="editedItem.firstName"
+                  label="First Name"
+                  required
+                ></v-text-field>
               </v-col>
-              <v-col cols="12" sm="4">
-                <v-text-field v-model="editedItem.middleName" label="Middle Name" required></v-text-field>
+              <v-col cols="12" sm="6" md="4">
+                <v-text-field
+                  v-model="editedItem.middleName"
+                  label="Middle Name"
+                  required
+                ></v-text-field>
               </v-col>
-              <v-col cols="12" sm="4">
-                <v-text-field v-model="editedItem.lastName" label="Last Name" required></v-text-field>
+              <v-col cols="12" sm="6" md="4">
+                <v-text-field
+                  v-model="editedItem.lastName"
+                  label="Last Name"
+                  required
+                ></v-text-field>
               </v-col>
-              <v-col cols="12" sm="4">
-                <v-text-field v-model="editedItem.section" label="Section" required></v-text-field>
+              <v-col cols="12" sm="6" md="4">
+                <v-select
+                  v-model="editedItem.yearLevel"
+                  :items="['First', 'Second', 'Third', 'Fourth']"
+                  label="Year Level"
+                  required
+                ></v-select>
               </v-col>
-              <v-col cols="12" sm="4">
-                <v-select v-model="editedItem.yearLevel" :items="['First', 'Second', 'Third', 'Fourth']" label="Year Level" required></v-select>
+              <v-col cols="12" sm="6" md="4">
+                <v-select
+                  v-model="editedItem.gender"
+                  :items="['Male', 'Female']"
+                  label="Gender"
+                  required
+                ></v-select>
               </v-col>
-              <v-col cols="12" sm="4">
-                <v-select v-model="editedItem.programId" :items="programs" item-text="programName" item-value="_id" label="Program" required></v-select>
+              <v-col cols="12" sm="6" md="4">
+                <v-text-field
+                  v-model="editedItem.email"
+                  label="Email"
+                  type="email"
+                  required
+                ></v-text-field>
               </v-col>
-              <v-col cols="12" sm="4">
-                <v-select v-model="editedItem.classroomId" :items="classrooms" item-text="name" item-value="_id" label="Classroom" required></v-select>
+              <v-col cols="12" sm="12" md="12">
+                <v-select
+                  v-model="editedItem.programId"
+                  :items="programs"
+                  item-text="programName"
+                  item-value="_id"
+                  label="Program"
+                  required
+                ></v-select>
               </v-col>
-              <v-col cols="12" sm="4">
-                <v-select v-model="editedItem.status" :items="['active', 'inactive']" label="Status" required></v-select>
+              <v-col cols="12" sm="6" md="4">
+                <v-select
+                  v-model="editedItem.classroomId"
+                  :items="classrooms"
+                  item-text="name"
+                  item-value="_id"
+                  label="Classroom"
+                ></v-select>
+              </v-col>
+              <v-col cols="12" sm="6" md="4">
+                <v-select
+                  v-model="editedItem.status"
+                  :items="['active', 'inactive']"
+                  label="Status"
+                  required
+                ></v-select>
               </v-col>
             </v-row>
           </v-container>
@@ -109,7 +161,9 @@
         <v-card-text>Are you sure you want to delete this student?</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="closeDeleteDialog">Cancel</v-btn>
+          <v-btn color="blue darken-1" text @click="closeDeleteDialog"
+            >Cancel</v-btn
+          >
           <v-btn color="red darken-1" text @click="deleteStudent">Delete</v-btn>
         </v-card-actions>
       </v-card>
@@ -141,8 +195,9 @@ export default {
       { text: "First Name", value: "firstName" },
       { text: "Middle Name", value: "middleName" },
       { text: "Last Name", value: "lastName" },
-      { text: "Section", value: "section" },
       { text: "Year Level", value: "yearLevel" },
+      { text: "Gender", value: "gender" },
+      { text: "Email", value: "email" },
       { text: "Program", value: "programId.programName" },
       { text: "Classroom", value: "classroomId.name" },
       { text: "Status", value: "status" },
@@ -154,23 +209,25 @@ export default {
     editedIndex: -1,
     editedItem: {
       _id: "",
-      StudentIdNo: "",
       firstName: "",
       middleName: "",
       lastName: "",
-      section: "",
+      StudentIdNo: "",
       yearLevel: null,
+      gender: null,
+      email: "",
       programId: null,
       classroomId: null,
       status: "active",
     },
     defaultItem: {
-      StudentIdNo: "",
       firstName: "",
       middleName: "",
       lastName: "",
-      section: "",
+      StudentIdNo: "",
       yearLevel: null,
+      gender: null,
+      email: "",
       programId: null,
       classroomId: null,
       status: "active",
@@ -258,7 +315,10 @@ export default {
     async saveStudent() {
       try {
         if (this.editedIndex > -1) {
-          await this.$http.put(`/student/${this.editedItem._id}`, this.editedItem);
+          await this.$http.put(
+            `/student/${this.editedItem._id}`,
+            this.editedItem
+          );
           Object.assign(this.students[this.editedIndex], this.editedItem);
           this.showSnackbar("Student updated successfully", "success");
         } else {

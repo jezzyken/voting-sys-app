@@ -5,6 +5,7 @@ const upload = require("../../middlewares/upload");
 
 router.get("/", CONTROLLER.getAll);
 router.get("/:id", CONTROLLER.getById);
+router.get("/election/:id", CONTROLLER.getByElectionId);
 router.post("/", upload.single("image"), CONTROLLER.add);
 router.put("/:id", CONTROLLER.update);
 router.delete("/:id", CONTROLLER.remove);

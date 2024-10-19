@@ -2,15 +2,14 @@ const MODEL = require("../models/studentModel");
 const { generateOTP, sendOTPEmail } = require("../utils/otpUtils");
 
 const getAll = async () => {
-  return await MODEL.find().populate("programId").populate("classroomId");
+  return await MODEL.find().populate("programId").populate("classroomId").sort({_id: -1});
 };
 
 const getById = async (id) => {
-  return await MODEL.findById(id).populate("programId").populate("classroomId");
+  return await MODEL.findById(id).populate("programId").populate("classroomId").sort({_id: -1});
 };
 
 const add = async (data) => {
-  console.log(data)
   const newItem = new MODEL(data);
   return await newItem.save();
 };

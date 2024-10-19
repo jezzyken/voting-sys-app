@@ -128,6 +128,17 @@ const routes = [
       },
     ],
   },
+  {
+    path: "/login",
+    component: FullPageLayout,
+    children: [
+      {
+        path: "",
+        name: "AdminLogin",
+        component: () => import("../views/LoginView.vue"),
+      },
+    ],
+  },
 ];
 
 const router = new VueRouter({
@@ -136,6 +147,21 @@ const router = new VueRouter({
   routes,
 });
 
+router.beforeEach((to, from, next) => {
+  const isAdminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true'
+  
+  if (to.path === '/login') {
+    if (isAdminLoggedIn) {
+      next({ name: 'Dashboard' })
+    } else {
+      next()
+    }
+  } else if (to.path.startsWith('/') && !isAdminLoggedIn) {
+    next('/login')
+  } else {
+    next()
+  }
+})
 
 router.beforeEach(async (to, from, next) => {
   if (!store.getters['student/isInitialized']) {

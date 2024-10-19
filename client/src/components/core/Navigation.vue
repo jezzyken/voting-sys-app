@@ -64,6 +64,7 @@
           :exact="true"
           link
           active-class="active-item"
+          @click="item.action ? item.action() : null"
         >
           <v-list-item-icon>
             <v-icon v-text="item.icon"></v-icon>
@@ -131,6 +132,7 @@ export default {
             },
           ],
         },
+        { title: "Logout", icon: "mdi-logout", action: this.logout },
       ];
     },
   },
@@ -143,6 +145,10 @@ export default {
         );
       }
       return false;
+    },
+    logout() {
+      localStorage.removeItem("adminLoggedIn");
+      this.$router.push("/login");
     },
   },
 };

@@ -1,9 +1,9 @@
 const config = {
   development: {
-    baseURL: process.env.VUE_APP_API_BASE_URL || 'http://localhost:3001/api/v1',
+    baseURL: 'http://localhost:3001/api/v1',
   },
   production: {
-    baseURL: process.env.VUE_APP_API_BASE_URL || 'https://your-production-api.com/api/v1',
+    baseURL: 'https://gitvote.onrender.com/api/v1',
   },
 };
 

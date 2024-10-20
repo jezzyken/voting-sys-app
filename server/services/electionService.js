@@ -10,8 +10,8 @@ const getOngoingElectionCandidates = async () => {
       $match: {
         status: "ongoing",
         electionType: "SSC",
-        startDate: { $lte: new Date() },
-        endDate: { $gte: new Date() },
+        // startDate: { $lte: new Date() },
+        // endDate: { $gte: new Date() },
       },
     },
     {

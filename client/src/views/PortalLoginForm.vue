@@ -80,7 +80,7 @@
                       class="mt-6"
                       elevation="2"
                     >
-                      {{ showOtp ? "Verify OTP" : "Send OTP" }}
+                      Login
                     </v-btn>
                   </v-form>
                   <div class="mt-6 text-center">

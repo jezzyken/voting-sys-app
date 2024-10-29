@@ -144,6 +144,29 @@
                 ></v-select>
               </v-col>
             </v-row>
+
+            <v-divider class="my-5"></v-divider>
+            <v-row>
+              <v-col cols="12">
+                <v-alert color="info" border="left" colored-border dense>
+                  Student Password Information
+                </v-alert>
+              </v-col>
+            </v-row>
+
+            <v-row>
+              <v-col cols="12" sm="6">
+                <v-text-field
+                  v-model="editedItem.password"
+                  :type="showPassword ? 'text' : 'password'"
+                  label="Student Password"
+                  :append-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
+                  @click:append="showPassword = !showPassword"
+                  outlined
+                  dense
+                ></v-text-field>
+              </v-col>
+            </v-row>
           </v-container>
         </v-card-text>
 
@@ -232,6 +255,7 @@ export default {
       classroomId: null,
       status: "active",
     },
+    showPassword: false,
   }),
 
   computed: {
@@ -298,6 +322,7 @@ export default {
     },
 
     closeDialog() {
+      this.showPassword = false;
       this.dialog = false;
       this.$nextTick(() => {
         this.editedItem = Object.assign({}, this.defaultItem);
@@ -353,6 +378,13 @@ export default {
       this.snackbarText = text;
       this.snackbarColor = color;
       this.snackbar = true;
+    },
+  },
+  watch: {
+    dialog(val) {
+      if (!val) {
+        this.showPassword = false;
+      }
     },
   },
 };

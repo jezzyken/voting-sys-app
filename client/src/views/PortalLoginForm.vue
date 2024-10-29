@@ -40,7 +40,17 @@
                       dense
                       required
                     ></v-text-field>
+                    </v-text-field>
                     <v-text-field
+                      v-model="password"
+                      label="Password"
+                      type="password"
+                      prepend-inner-icon="mdi-lock"
+                      outlined
+                      dense
+                      required
+                    ></v-text-field>
+                    <!-- <v-text-field
                       v-model="email"
                       label="Email"
                       type="email"
@@ -48,8 +58,8 @@
                       outlined
                       dense
                       required
-                    ></v-text-field>
-                    <v-expand-transition>
+                    ></v-text-field> -->
+                    <!-- <v-expand-transition>
                       <v-text-field
                         v-if="showOtp"
                         v-model="otp"
@@ -60,7 +70,7 @@
                         dense
                         required
                       ></v-text-field>
-                    </v-expand-transition>
+                    </v-expand-transition> -->
                     <v-btn
                       color="primary"
                       type="submit"
@@ -105,6 +115,7 @@ export default {
     showOtp: false,
     loading: false,
     error: "",
+    password: ""
   }),
   methods: {
     ...mapActions("student", ["login"]),
@@ -115,15 +126,19 @@ export default {
       try {
         const result = await this.login({
           studentId: this.studentId,
-          email: this.email,
-          otp: this.showOtp ? this.otp : null,
+          password: this.password,
+          // email: this.email,
+          // otp: this.showOtp ? this.otp : null,
         });
+
+        console.log(result)
         if (result.error) {
           this.error = result.error;
-          if (this.error === "OTP has expired") {
-            this.showOtp = false;
-            this.otp = "";
-          }
+          alert("Invalid Student ID or password")
+          // if (this.error === "OTP has expired") {
+          //   this.showOtp = false;
+          //   this.otp = "";
+          // }
         } else {
           this.$root.$emit("show-snackbar", result.message);
           if (result.showOtp) {

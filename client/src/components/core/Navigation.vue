@@ -99,17 +99,20 @@ export default {
     menuItems() {
       return [
         { title: "Dashboard", path: "/", icon: "mdi-view-dashboard" },
-        { title: "Classroom", path: "/classroom", icon: "mdi-cog" },
-        { title: "Programs", path: "/programs", icon: "mdi-cog" },
-        { title: "Students", path: "/students", icon: "mdi-cog" },
-        // { title: "Positions", path: "/positions", icon: "mdi-cog" },
-        { title: "Party", path: "/party", icon: "mdi-cog" },
-        { title: "Elections", path: "/elections", icon: "mdi-cog" },
-        { title: "Candidates", path: "/candidates", icon: "mdi-cog" },
-        { title: "Election Page", path: "/election/view", icon: "mdi-cog" },
+        {
+          title: "Section",
+          path: "/section",
+          icon: "mdi-google-classroom",
+        },
+        { title: "Programs", path: "/programs", icon: "mdi-book-education" },
+        { title: "Students", path: "/students", icon: "mdi-account-school" },
+        { title: "Party", path: "/party", icon: "mdi-account-group" },
+        { title: "Elections", path: "/elections", icon: "mdi-vote" },
+        { title: "Candidates", path: "/candidates", icon: "mdi-account-star" },
+        { title: "Election Page", path: "/election/view", icon: "mdi-poll" },
         {
           title: "Users",
-          icon: "mdi-account-group",
+          icon: "mdi-account-cog",
           children: [
             {
               title: "List Users",
@@ -119,22 +122,22 @@ export default {
             { title: "Add User", path: "/users/add", icon: "mdi-account-plus" },
           ],
         },
-        {
-          title: "Reports",
-          icon: "mdi-file-chart",
-          children: [
-            {
-              title: "Sales Report",
-              path: "/reports/sales",
-              icon: "mdi-currency-usd",
-            },
-            {
-              title: "User Activity",
-              path: "/reports/activity",
-              icon: "mdi-chart-line",
-            },
-          ],
-        },
+        // {
+        //   title: "Reports",
+        //   icon: "mdi-file-chart",
+        //   children: [
+        //     {
+        //       title: "Sales Report",
+        //       path: "/reports/sales",
+        //       icon: "mdi-currency-usd",
+        //     },
+        //     {
+        //       title: "User Activity",
+        //       path: "/reports/activity",
+        //       icon: "mdi-chart-line",
+        //     },
+        //   ],
+        // },
         { title: "Logout", icon: "mdi-logout", action: this.logout },
       ];
     },

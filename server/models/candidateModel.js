@@ -16,11 +16,6 @@ const candidateSchema = new mongoose.Schema(
     position: { type: String, required: true },
     manifesto: { type: String, required: true },
     imageUrl: { type: String, required: true },
-    status: {
-      type: String,
-      enum: ["pending", "approved", "rejected"],
-      default: "pending",
-    },
   },
   { timestamps: true }
 );

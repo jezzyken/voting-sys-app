@@ -35,35 +35,59 @@ const mutations = {
 };
 
 const actions = {
-  async login({ commit }, { studentId, email, otp }) {
+  async login({ commit }, { studentId, password }) {
+
     try {
-      let response;
-      if (!otp) {
-        response = await api.post("/student/initiate-login", {
-          studentId,
-          email,
-        });
-        if (response.data.status === "success") {
-          return { showOtp: true, message: response.data.message };
-        }
-      } else {
-        response = await api.post("/student/verify-otp", {
-          studentId,
-          otp,
-        });
-        if (response.data.status === "success") {
-          commit("SET_LOGGED_IN", { isLoggedIn: true, studentId });
-          localStorage.setItem("isLoggedIn", "true");
-          localStorage.setItem("studentId", studentId);
-          return { showOtp: false, message: response.data.message };
-        }
+      const response = await api.post("/student/initiate-login", {
+        studentId,
+        password,
+      });
+
+      console.log(response)
+  
+      if (response.data.status === "success") {
+        commit("SET_LOGGED_IN", { isLoggedIn: true, studentId });
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("studentId", response.data.student.id);
+        return { message: response.data.message };
       }
+  
       throw new Error(response.data.message);
     } catch (error) {
       console.log(error);
       commit("SET_ERROR", error.message);
       return { error: error.message };
     }
+
+
+    // try {
+    //   let response;
+    //   if (!otp) {
+    //     response = await api.post("/student/initiate-login", {
+    //       studentId,
+    //       email,
+    //     });
+    //     if (response.data.status === "success") {
+    //       return { showOtp: true, message: response.data.message };
+    //     }
+    //   } else {
+    //     response = await api.post("/student/verify-otp", {
+    //       studentId,
+    //       otp,
+    //     });
+    //     if (response.data.status === "success") {
+    //       commit("SET_LOGGED_IN", { isLoggedIn: true, studentId });
+    //       localStorage.setItem("isLoggedIn", "true");
+    //       localStorage.setItem("studentId", studentId);
+    //       return { showOtp: false, message: response.data.message };
+    //     }
+    //   }
+    //   throw new Error(response.data.message);
+    // } catch (error) {
+    //   console.log(error);
+    //   commit("SET_ERROR", error.message);
+    //   return { error: error.message };
+    // }
   },
 
   logout({ commit }) {

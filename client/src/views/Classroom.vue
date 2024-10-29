@@ -2,12 +2,12 @@
   <v-container fluid>
     <v-card class="elevation-2">
       <v-card-title class="headline">
-        Classrooms
+        Section
         <v-spacer></v-spacer>
         <v-text-field
           v-model="search"
           prepend-inner-icon="mdi-magnify"
-          label="Search classrooms"
+          label="Search section"
           clearable
           outlined
           rounded
@@ -18,7 +18,7 @@
         ></v-text-field>
         <v-btn color="primary" @click="openCreateDialog">
           <v-icon left>mdi-plus</v-icon>
-          Add New Classroom
+          Add New Section
         </v-btn>
       </v-card-title>
 
@@ -29,8 +29,8 @@
         :items-per-page="10"
         class="elevation-1"
         :loading="loading"
-        loading-text="Loading classrooms... Please wait"
-        no-data-text="No classrooms found"
+        loading-text="Loading section... Please wait"
+        no-data-text="No section found"
         :footer-props="{
           'items-per-page-options': [5, 10, 15, 20],
         }"
@@ -63,8 +63,8 @@
               <v-col cols="12">
                 <v-text-field
                   v-model="editedItem.name"
-                  label="Classroom Name"
-                  :rules="[v => !!v || 'Classroom name is required']"
+                  label="Section Name"
+                  :rules="[v => !!v || 'Section name is required']"
                   required
                 ></v-text-field>
               </v-col>
@@ -115,7 +115,7 @@ export default {
     loading: false,
     search: "",
     headers: [
-      { text: "Classroom Name", value: "name", align: 'start', sortable: true },
+      { text: "Section Name", value: "name", align: 'start', sortable: true },
       { text: "Actions", value: "actions", sortable: false, align: 'end' },
     ],
     classrooms: [],
@@ -131,7 +131,7 @@ export default {
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? "New Classroom" : "Edit Classroom";
+      return this.editedIndex === -1 ? "New Section" : "Edit Section";
     },
   },
 

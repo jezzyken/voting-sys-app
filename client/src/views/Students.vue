@@ -132,7 +132,7 @@
                   :items="classrooms"
                   item-text="name"
                   item-value="_id"
-                  label="Classroom"
+                  label="Section"
                 ></v-select>
               </v-col>
               <v-col cols="12" sm="6" md="4">

@@ -67,8 +67,8 @@ const routes = [
         component: () => import("../views/Party.vue"),
       },
       {
-        path: "classroom",
-        name: "Classroom",
+        path: "section",
+        name: "Section",
         component: () => import("../views/Classroom.vue"),
       },
       {
@@ -124,6 +124,26 @@ const routes = [
             name: "Candidates Page",
             component: () => import("../views/CandidatesPage.vue"),
           },
+          {
+            path: "votes/:id",
+            name: "Vote Page",
+            component: () => import("../views/ElectionCandidatesPage.vue"),
+          },
+          {
+            path: '/election/success/:id',
+            name: 'VoteSuccess',
+            component: () => import('@/views/VoteSuccess.vue')
+          },
+          {
+            path: '/election/already-voted/:id',
+            name: 'AlreadyVoted',
+            component: () => import('@/views/AlreadyVoted.vue')
+          },
+          {
+            path: '/election/results/:id',
+            name: 'Election Results',
+            component: () => import('@/views/ElectionResults.vue')
+          }
         ],
       },
     ],

@@ -33,8 +33,8 @@ const search = async (req) => {
 };
 
 //Auth
-const initiateLogin = async (studentId, email) => {
-  console.log(studentId, email)
+const initiateLogin = async (studentId, password) => {
+  console.log(studentId, password)
   const student = await MODEL.findOne({ StudentIdNo: studentId });
 
   if (!student) {
@@ -45,16 +45,23 @@ const initiateLogin = async (studentId, email) => {
     return { status: "error", message: "Student account is inactive" };
   }
 
-  const otp = generateOTP();
-  const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
+  // const otp = generateOTP();
+  // const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
 
-  student.otp = otp;
-  student.otpExpires = otpExpires;
-  await student.save();
+  // student.otp = otp;
+  // student.otpExpires = otpExpires;
+  // await student.save();
 
-  await sendOTPEmail(email, otp);
+  // await sendOTPEmail(email, otp);
 
-  return { status: "success", message: "OTP sent successfully" };
+  // Check if the password matches
+  if (student.password !== password) {
+    return { status: "error", message: "Incorrect password" };
+  }
+
+  return { status: "success", message: "Login successful", student: {id: student._id}  };
+
+  // return { status: "success", message: "OTP sent successfully" };
 };
 
 const verifyOTP = async (studentId, otp) => {
@@ -63,7 +70,7 @@ const verifyOTP = async (studentId, otp) => {
   console.log(student)
 
   if (!student) {
-    return { status: "error", message: "Student not found" };
+    return { status: "error", message: "Student not found"};
   }
 
   if (student.otp !== otp) {

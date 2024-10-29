@@ -5,7 +5,8 @@ import store from './store';
 import vuetify from './plugins/vuetify';
 import axios from 'axios';
 import { baseURL, currentEnv } from './config/baseURL';
-
+import VueConfetti from 'vue-confetti'
+Vue.use(VueConfetti)
 Vue.config.productionTip = false;
 
 axios.defaults.baseURL = baseURL;

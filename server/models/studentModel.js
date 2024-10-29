@@ -1,4 +1,3 @@
-// models/studentModel.js
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
@@ -24,8 +23,26 @@ const studentSchema = new mongoose.Schema(
     status: { type: String, enum: ["active", "inactive"], default: "active" },
     otp: { type: String },
     otpExpires: { type: Date },
+    password: { type: String },
   },
   { timestamps: true }
 );
+
+function generateRandomPassword(length = 8) {
+  const chars =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let password = "";
+  for (let i = 0; i < length; i++) {
+    password += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return password;
+}
+
+studentSchema.pre("save", function (next) {
+  if (!this.password) {
+    this.password = generateRandomPassword();
+  }
+  next();
+});
 
 module.exports = mongoose.model("Student", studentSchema);

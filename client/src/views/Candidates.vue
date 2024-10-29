@@ -77,7 +77,7 @@
                 :items="students"
                 item-text="name"
                 item-value="_id"
-                label="Search Student by Name or LRN"
+                label="Search Student"
                 placeholder="Start typing to search"
                 prepend-icon="mdi-database-search"
                 return-object
@@ -134,7 +134,7 @@
               ></v-select> -->
               <v-textarea
                 v-model="editedItem.manifesto"
-                label="Manifesto"
+                label="Campaign Message"
                 required
                 :rules="[(v) => !!v || 'Manifesto is required']"
               ></v-textarea>

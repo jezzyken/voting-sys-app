@@ -1,7 +1,7 @@
 const MODEL = require("../models/electionModel");
 
 const getAll = async () => {
-  return await MODEL.find().sort({_id: -1});
+  return await MODEL.find().sort({ _id: -1 });
 };
 
 const getOngoingElectionCandidates = async () => {
@@ -70,7 +70,7 @@ const getOngoingElectionCandidates = async () => {
 
   const results = await MODEL.aggregate(pipeline);
 
-  return results
+  return results;
 };
 
 const getUpcomingEvents = async () => {

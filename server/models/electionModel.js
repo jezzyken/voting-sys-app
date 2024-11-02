@@ -1,4 +1,3 @@
-// models/electionModel.js
 const mongoose = require("mongoose");
 
 const electionSchema = new mongoose.Schema(

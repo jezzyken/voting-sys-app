@@ -168,51 +168,194 @@
                   </v-progress-linear>
                 </template>
               </v-data-table>
+              <v-expansion-panels class="mt-4">
+                <v-expansion-panel>
+                  <v-expansion-panel-header class="primary--text">
+                    <v-icon left>mdi-chart-box</v-icon>
+                    Demographics Breakdown
+                  </v-expansion-panel-header>
+
+                  <v-expansion-panel-content>
+                    <v-tabs
+                      v-model="activeTab"
+                      background-color="transparent"
+                      color="primary"
+                    >
+                      <v-tab>
+                        <v-icon left>mdi-school</v-icon>
+                        By Course
+                      </v-tab>
+                      <v-tab>
+                        <v-icon left>mdi-account-group</v-icon>
+                        By Year Level
+                      </v-tab>
+                    </v-tabs>
+
+                    <v-tabs-items v-model="activeTab">
+                      <v-tab-item>
+                        <v-card flat>
+                          <v-card-text>
+                            <div
+                              v-for="candidate in getTableItems(candidates)"
+                              :key="candidate.studentName"
+                            >
+                              <h3 class="subtitle-1 font-weight-bold mb-2">
+                                {{ candidate.studentName }}
+                                <v-chip
+                                  small
+                                  :color="getRankColor(candidate.rank)"
+                                  dark
+                                  class="ml-2"
+                                >
+                                  {{ candidate.votes }} votes
+                                </v-chip>
+                              </h3>
+
+                              <v-simple-table dense>
+                                <template v-slot:default>
+                                  <thead>
+                                    <tr>
+                                      <th>Course</th>
+                                      <th class="text-center">Votes</th>
+                                      <th class="text-right">Percentage</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    <tr
+                                      v-for="program in getProgramBreakdown(
+                                        candidate
+                                      )"
+                                      :key="program.programId"
+                                    >
+                                      <td>{{ program.programName }}</td>
+                                      <td class="text-center">
+                                        {{ program.votes }}
+                                      </td>
+                                      <td class="text-right">
+                                        <v-progress-linear
+                                          :value="
+                                            calculateProgramPercentage(
+                                              program.votes,
+                                              candidate.votes
+                                            )
+                                          "
+                                          height="20"
+                                          :color="
+                                            getProgressColor(candidate.rank)
+                                          "
+                                        >
+                                          <template v-slot:default>
+                                            {{
+                                              calculateProgramPercentage(
+                                                program.votes,
+                                                candidate.votes
+                                              )
+                                            }}%
+                                          </template>
+                                        </v-progress-linear>
+                                      </td>
+                                    </tr>
+                                  </tbody>
+                                </template>
+                              </v-simple-table>
+                              <v-divider class="my-4"></v-divider>
+                            </div>
+                          </v-card-text>
+                        </v-card>
+                      </v-tab-item>
+
+                      <!-- Year Level breakdown -->
+                      <v-tab-item>
+                        <v-card flat>
+                          <v-card-text>
+                            <div
+                              v-for="candidate in getTableItems(candidates)"
+                              :key="candidate.studentName"
+                            >
+                              <h3 class="subtitle-1 font-weight-bold mb-2">
+                                {{ candidate.studentName }}
+                                <v-chip
+                                  small
+                                  :color="getRankColor(candidate.rank)"
+                                  dark
+                                  class="ml-2"
+                                >
+                                  {{ candidate.votes }} votes
+                                </v-chip>
+                              </h3>
+
+                              <v-simple-table dense>
+                                <template v-slot:default>
+                                  <thead>
+                                    <tr>
+                                      <th>Year Level</th>
+                                      <th class="text-center">Votes</th>
+                                      <th class="text-right">Percentage</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    <tr
+                                      v-for="year in getYearLevelBreakdown(
+                                        candidate
+                                      )"
+                                      :key="year.yearLevel"
+                                    >
+                                      <td>{{ year.yearLevel }}</td>
+                                      <td class="text-center">
+                                        {{ year.votes }}
+                                      </td>
+                                      <td class="text-right">
+                                        <v-progress-linear
+                                          :value="
+                                            calculateProgramPercentage(
+                                              year.votes,
+                                              candidate.votes
+                                            )
+                                          "
+                                          height="20"
+                                          :color="
+                                            getProgressColor(candidate.rank)
+                                          "
+                                        >
+                                          <template v-slot:default>
+                                            {{
+                                              calculateProgramPercentage(
+                                                year.votes,
+                                                candidate.votes
+                                              )
+                                            }}%
+                                          </template>
+                                        </v-progress-linear>
+                                      </td>
+                                    </tr>
+                                  </tbody>
+                                </template>
+                              </v-simple-table>
+                              <v-divider class="my-4"></v-divider>
+                            </div>
+                          </v-card-text>
+                        </v-card>
+                      </v-tab-item>
+                    </v-tabs-items>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+              </v-expansion-panels>
             </v-card-text>
           </v-card>
         </v-col>
       </v-row>
-
-      <!-- Export Options -->
-      <!-- <v-card outlined class="mb-6">
-        <v-card-text>
-          <v-row align="center" justify="center">
-            <v-col cols="auto">
-              <v-btn
-                color="primary"
-                outlined
-                @click="exportResults('pdf')"
-                :loading="exporting === 'pdf'"
-                :disabled="exporting"
-              >
-                <v-icon left>mdi-file-pdf-box</v-icon>
-                Export as PDF
-              </v-btn>
-            </v-col>
-            <v-col cols="auto">
-              <v-btn
-                color="success"
-                outlined
-                @click="exportResults('excel')"
-                :loading="exporting === 'excel'"
-                :disabled="exporting"
-              >
-                <v-icon left>mdi-file-excel</v-icon>
-                Export as Excel
-              </v-btn>
-            </v-col>
-          </v-row>
-        </v-card-text>
-      </v-card> -->
     </template>
 
-    <!-- Navigation -->
-    <v-btn color="primary" outlined class="mt-4" :to="{ path: '/election/portal' }">
+    <v-btn
+      color="primary"
+      outlined
+      class="mt-4"
+      :to="{ path: '/election/portal' }"
+    >
       <v-icon left>mdi-arrow-left</v-icon>
       Back to Elections
     </v-btn>
 
-    <!-- Snackbar for notifications -->
     <v-snackbar
       v-model="snackbar.show"
       :color="snackbar.color"
@@ -268,6 +411,8 @@ export default {
   },
 
   data: () => ({
+    activeTab: null,
+    demographics: null,
     results: null,
     electionDetails: null,
     loading: false,
@@ -340,17 +485,76 @@ export default {
   },
 
   methods: {
+    getProgramBreakdown(candidate) {
+      if (!candidate || !this.demographics) {
+        return [];
+      }
+
+      const position = Object.keys(this.results).find((pos) =>
+        this.results[pos].some((c) => c.studentName === candidate.studentName)
+      );
+
+      if (!position || !this.demographics[position]) {
+        return [];
+      }
+
+      const candidateData = this.demographics[position].candidates.find(
+        (c) => c.candidateName === candidate.studentName
+      );
+
+      if (!candidateData?.programBreakdown) {
+        return [];
+      }
+
+      return candidateData.programBreakdown;
+    },
+
+    getYearLevelBreakdown(candidate) {
+      if (!candidate || !this.demographics) {
+        return [];
+      }
+
+      const position = Object.keys(this.results).find((pos) =>
+        this.results[pos].some((c) => c.studentName === candidate.studentName)
+      );
+
+      if (!position || !this.demographics[position]) {
+        return [];
+      }
+
+      const candidateData = this.demographics[position].candidates.find(
+        (c) => c.candidateName === candidate.studentName
+      );
+
+      if (!candidateData?.programBreakdown?.[0]?.yearLevels) {
+        return [];
+      }
+
+      return candidateData.programBreakdown[0].yearLevels;
+    },
+
+    calculateProgramPercentage(votes, totalVotes) {
+      if (!totalVotes || !votes) return 0;
+      const percentage = (votes / totalVotes) * 100;
+      return percentage.toFixed(1);
+    },
+
     async fetchResults() {
       this.loading = true;
       this.error = null;
       try {
-        const [resultsResponse, electionResponse] = await Promise.all([
-          this.$http.get(`/vote/results/${this.electionId}`),
-          this.$http.get(`/election/${this.electionId}`),
-        ]);
+        const [resultsResponse, electionResponse, demographicsResponse] =
+          await Promise.all([
+            this.$http.get(`/vote/results/${this.electionId}`),
+            this.$http.get(`/election/${this.electionId}`),
+            this.$http.get(`/vote/results/${this.electionId}/demographics`),
+          ]);
 
         this.results = resultsResponse.data.data;
         this.electionDetails = electionResponse.data;
+        this.demographics = demographicsResponse.data.data;
+
+        console.log(this.demographics);
         this.calculateTotalVotes();
       } catch (error) {
         console.error("Error fetching results:", error);
@@ -589,7 +793,6 @@ export default {
   opacity: 0;
 }
 
-/* Additional styles for the data table */
 .v-data-table ::v-deep {
   .v-data-table__wrapper {
     overflow-x: auto;
@@ -615,7 +818,6 @@ export default {
   }
 }
 
-/* Custom scrollbar for webkit browsers */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -633,5 +835,43 @@ export default {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #666;
+}
+
+.v-data-table {
+  background: transparent !important;
+}
+
+.v-data-table ::v-deep td {
+  height: 40px !important;
+}
+
+.demographics-table {
+  margin-top: 16px;
+}
+
+.v-progress-linear {
+  border-radius: 4px;
+}
+
+.candidate-breakdown {
+  margin-bottom: 24px;
+}
+
+.v-expansion-panel-content .v-card {
+  box-shadow: none !important;
+}
+
+.v-tabs {
+  margin-bottom: 16px;
+}
+
+@media (max-width: 600px) {
+  .v-data-table {
+    overflow-x: auto;
+  }
+
+  .demographics-breakdown {
+    padding: 8px;
+  }
 }
 </style>

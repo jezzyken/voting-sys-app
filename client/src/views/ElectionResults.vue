@@ -2,7 +2,7 @@
   <v-container>
     <!-- Header Section -->
     <v-row justify="center" class="mb-6">
-      <v-col cols="12" md="10">
+      <v-col cols="12" md="12">
         <v-card class="primary" dark>
           <v-card-text class="text-center py-4">
             <h1 class="text-h4 font-weight-bold mb-2">Election Results</h1>

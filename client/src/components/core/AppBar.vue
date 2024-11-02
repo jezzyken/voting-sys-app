@@ -19,7 +19,7 @@
           </v-avatar> -->
 
           <v-avatar color="primary" size="32">
-            <span class="white--text text-caption">GV</span>
+            <span class="white--text text-caption">{{ userInitials }}</span>
           </v-avatar>
         </v-btn>
       </template>
@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import { mapMutations } from "vuex";
+import { mapMutations, mapGetters } from "vuex";
 
 export default {
   name: "AppBar",
@@ -52,8 +52,23 @@ export default {
     };
   },
   computed: {
+    ...mapGetters("auth", ["user"]),
     currentPageTitle() {
       return this.$route.name || "Dashboard";
+    },
+    userName() {
+      return this.user?.name || "Admin";
+    },
+
+    userInitials() {
+      if (!this.user?.name) return "A";
+
+      return this.user.name
+        .split(" ")
+        .map((word) => word[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2);
     },
   },
   methods: {

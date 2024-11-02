@@ -15,6 +15,7 @@ const routes = [
   {
     path: "/",
     component: MainLayout,
+    meta: { requiresAuth: true },
     children: [
       {
         path: "",
@@ -80,6 +81,16 @@ const routes = [
         path: "settings",
         name: "Settings",
         component: () => import("../views/Settings.vue"),
+      },
+      {
+        path: "/election/results/:id/view",
+        name: "View Results",
+        component: () => import('@/views/ElectionResults.vue')
+      },
+      {
+        path: "/reports",
+        name: "reports",
+        component: () => import('@/views/VotingReport.vue')
       },
     ],
   },
@@ -168,18 +179,16 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const isAdminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true'
-  
-  if (to.path === '/login') {
-    if (isAdminLoggedIn) {
-      next({ name: 'Dashboard' })
-    } else {
-      next()
-    }
-  } else if (to.path.startsWith('/') && !isAdminLoggedIn) {
-    next('/login')
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+  const isPublic = to.matched.some(record => record.meta.public);
+  const isAuthenticated = store.getters['auth/isAuthenticated'];
+
+  if (requiresAuth && !isAuthenticated) {
+    next('/login');
+  } else if (isAuthenticated && isPublic) {
+    next('/');
   } else {
-    next()
+    next();
   }
 })
 

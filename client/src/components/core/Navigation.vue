@@ -10,15 +10,11 @@
   >
     <v-list-item class="px-2">
       <v-list-item-avatar>
-        <!-- <v-img
-          src="https://lh3.googleusercontent.com/a/ACg8ocLdHlNO2csW9twKE8giqa_NnbUqNvbNCj1neZUr1IH7WbvanFI=s83-c-mo"
-        ></v-img> -->
-        <v-avatar color="primary">
-          <span class="white--text text-caption">GV</span>
+        <v-avatar color="primary" size="40">
+          <span class="white--text text-caption">{{ userInitials }}</span>
         </v-avatar>
       </v-list-item-avatar>
-
-      <v-list-item-title class="text-h6">Admin</v-list-item-title>
+      <v-list-item-title class="text-h6">{{ userName }}</v-list-item-title>
 
       <v-btn icon @click.stop="toggleMini">
         <v-icon>{{ mini ? "mdi-chevron-right" : "mdi-chevron-left" }}</v-icon>
@@ -82,12 +78,13 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from "vuex";
+import { mapState, mapMutations, mapActions, mapGetters } from "vuex";
 
 export default {
   name: "Navigation",
   computed: {
     ...mapState("app", ["drawer", "mini"]),
+    ...mapGetters("auth", ["user"]),
     drawer: {
       get() {
         return this.$store.state.app.drawer;
@@ -95,6 +92,20 @@ export default {
       set(value) {
         this.$store.commit("app/setDrawer", value);
       },
+    },
+    userName() {
+      return this.user?.name || "Admin";
+    },
+
+    userInitials() {
+      if (!this.user?.name) return "A";
+
+      return this.user.name
+        .split(" ")
+        .map((word) => word[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2);
     },
     menuItems() {
       return [
@@ -110,18 +121,8 @@ export default {
         { title: "Elections", path: "/elections", icon: "mdi-vote" },
         { title: "Candidates", path: "/candidates", icon: "mdi-account-star" },
         { title: "Election Page", path: "/election/view", icon: "mdi-poll" },
-        {
-          title: "Users",
-          icon: "mdi-account-cog",
-          children: [
-            {
-              title: "List Users",
-              path: "/users",
-              icon: "mdi-format-list-bulleted",
-            },
-            { title: "Add User", path: "/users/add", icon: "mdi-account-plus" },
-          ],
-        },
+        { title: "Users", path: "/users", icon: "mdi-account-plus" },
+        { title: "Reports", path: "/reports", icon: "mdi-file-chart" },
         // {
         //   title: "Reports",
         //   icon: "mdi-file-chart",
@@ -138,12 +139,13 @@ export default {
         //     },
         //   ],
         // },
-        { title: "Logout", icon: "mdi-logout", action: this.logout },
+        { title: "Logout", icon: "mdi-logout", action: this.logoutUser },
       ];
     },
   },
   methods: {
     ...mapMutations("app", ["toggleMini"]),
+    ...mapActions("auth", ["login", "logout"]),
     isGroupActive(item) {
       if (item.children) {
         return item.children.some((child) =>
@@ -152,9 +154,8 @@ export default {
       }
       return false;
     },
-    logout() {
-      localStorage.removeItem("adminLoggedIn");
-      this.$router.push("/login");
+    logoutUser() {
+      this.logout();
     },
   },
 };

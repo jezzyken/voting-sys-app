@@ -2,10 +2,10 @@ import axios from "axios";
 import authConfig from "@/config/auth.config";
 import router from "@/router";
 import store from "@/store";
-import { config } from "../config/baseURL";
+import { baseURL } from "../config/baseURL";
 
 const axiosInstance = axios.create({
-  baseURL: config,
+  baseURL: baseURL,
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",

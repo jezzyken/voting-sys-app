@@ -2,11 +2,17 @@ const MODEL = require("../models/studentModel");
 const { generateOTP, sendOTPEmail } = require("../utils/otpUtils");
 
 const getAll = async () => {
-  return await MODEL.find().populate("programId").populate("classroomId").sort({_id: -1});
+  return await MODEL.find()
+    .populate("programId")
+    .populate("classroomId")
+    .sort({ _id: -1 });
 };
 
 const getById = async (id) => {
-  return await MODEL.findById(id).populate("programId").populate("classroomId").sort({_id: -1});
+  return await MODEL.findById(id)
+    .populate("programId")
+    .populate("classroomId")
+    .sort({ _id: -1 });
 };
 
 const add = async (data) => {
@@ -33,9 +39,12 @@ const search = async (req) => {
 };
 
 //Auth
-const initiateLogin = async (studentId, password) => {
-  console.log(studentId, password)
+const initiateLogin = async (studentId, password, email) => {
+  console.log(studentId, password, email);
+
   const student = await MODEL.findOne({ StudentIdNo: studentId });
+
+  console.log(student)
 
   if (!student) {
     return { status: "error", message: "Student not found" };
@@ -45,39 +54,47 @@ const initiateLogin = async (studentId, password) => {
     return { status: "error", message: "Student account is inactive" };
   }
 
-  // const otp = generateOTP();
-  // const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
+  const otp = generateOTP();
+  const otpExpires = new Date(Date.now() + 5 * 60 * 1000);
 
-  // student.otp = otp;
-  // student.otpExpires = otpExpires;
-  // await student.save();
+  student.otp = otp;
+  student.otpExpires = otpExpires;
+  await student.save();
 
-  // await sendOTPEmail(email, otp);
+  console.log(student)
+
+  await sendOTPEmail(student.email, otp);
 
   // Check if the password matches
-  if (student.password !== password) {
-    return { status: "error", message: "Incorrect password" };
-  }
+  // if (student.password !== password) {
+  //   return { status: "error", message: "Incorrect password" };
+  // }
 
-  return { status: "success", message: "Login successful", student: {id: student._id}  };
-
-  // return { status: "success", message: "OTP sent successfully" };
+  return {
+    status: "success",
+    message: "OTP sent successfully",
+    student: { id: student._id },
+    showOtp: true
+  };
 };
 
 const verifyOTP = async (studentId, otp) => {
-  console.log(studentId, otp)
+  console.log(studentId, otp);
   const student = await MODEL.findOne({ StudentIdNo: studentId });
-  console.log(student)
+  console.log(student);
 
   if (!student) {
-    return { status: "error", message: "Student not found"};
+    console.log({message: "Student not found"})
+    return { status: "error", message: "Student not found" };
   }
 
   if (student.otp !== otp) {
+    console.log({ message: "Invalid OTP" })
     return { status: "error", message: "Invalid OTP" };
   }
 
   if (new Date() > student.otpExpires) {
+    console.log({message: "OTP has expired" })
     return { status: "error", message: "OTP has expired" };
   }
 
@@ -85,7 +102,7 @@ const verifyOTP = async (studentId, otp) => {
   student.otpExpires = undefined;
   await student.save();
 
-  return { status: "success", message: "Login successful" };
+  return { status: "success", message: "Login successful", student: { id: student._id },};
 };
 
 module.exports = {

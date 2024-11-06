@@ -7,14 +7,9 @@
           <v-card elevation="10" class="login-card mx-auto">
             <v-row no-gutters>
               <v-col cols="12" md="5" class="login-image d-none d-md-flex">
-                <v-img
-                  src="https://source.unsplash.com/random/800x1200?voting"
-                  gradient="to top right, rgba(19,84,122,.9), rgba(128,208,199,.9)"
-                  class="fill-height"
-                >
-                  <div
-                    class="image-overlay d-flex flex-column justify-center align-center text-center px-4"
-                  >
+                <v-img src="https://source.unsplash.com/random/800x1200?voting"
+                  gradient="to top right, rgba(19,84,122,.9), rgba(128,208,199,.9)" class="fill-height">
+                  <div class="image-overlay d-flex flex-column justify-center align-center text-center px-4">
                     <h2 class="text-h4 font-weight-bold white--text mb-3">
                       GITVote
                     </h2>
@@ -26,22 +21,14 @@
               </v-col>
               <v-col cols="12" md="7">
                 <v-card-text class="pa-8">
-                  <h1
-                    class="text-h4 font-weight-bold mb-6 primary--text text-center"
-                  >
+                  <h1 class="text-h4 font-weight-bold mb-6 primary--text text-center">
                     Login
                   </h1>
                   <v-form @submit.prevent="submitLogin">
-                    <v-text-field
-                      v-model="studentId"
-                      label="Student ID"
-                      prepend-inner-icon="mdi-account"
-                      outlined
-                      dense
-                      required
-                    ></v-text-field>
+                    <v-text-field v-model="studentId" label="Student ID" prepend-inner-icon="mdi-account" outlined dense
+                      required></v-text-field>
                     </v-text-field>
-                    <v-text-field
+                    <!-- <v-text-field
                       v-model="password"
                       label="Password"
                       type="password"
@@ -49,7 +36,7 @@
                       outlined
                       dense
                       required
-                    ></v-text-field>
+                    ></v-text-field> -->
                     <!-- <v-text-field
                       v-model="email"
                       label="Email"
@@ -59,37 +46,25 @@
                       dense
                       required
                     ></v-text-field> -->
-                    <!-- <v-expand-transition>
-                      <v-text-field
-                        v-if="showOtp"
-                        v-model="otp"
-                        label="OTP"
-                        type="number"
-                        prepend-inner-icon="mdi-lock"
-                        outlined
-                        dense
-                        required
-                      ></v-text-field>
-                    </v-expand-transition> -->
-                    <v-btn
-                      color="primary"
-                      type="submit"
-                      block
-                      large
-                      :loading="loading"
-                      class="mt-6"
-                      elevation="2"
-                    >
-                      Login
+                    <v-expand-transition>
+                      <v-text-field v-if="showOtp" v-model="otp" label="OTP" type="number" prepend-inner-icon="mdi-lock"
+                        outlined dense required>
+
+                        <template v-slot:append>
+                          <v-btn text small color="primary" :disabled="!canResendOtp" @click="resendOtp" class="ml-2">
+                            {{ resendButtonText }}
+                          </v-btn>
+                        </template>
+
+
+                      </v-text-field>
+                    </v-expand-transition>
+                    <v-btn color="primary" type="submit" block large :loading="loading" class="mt-6" elevation="2" :disabled="showOtp && !otp">
+                      {{ showOtp ? "Verify OTP" : "Send OTP" }}
                     </v-btn>
                   </v-form>
                   <div class="mt-6 text-center">
-                    <v-btn
-                      text
-                      color="secondary"
-                      @click="$router.push('/election/view')"
-                      class="text-capitalize"
-                    >
+                    <v-btn text color="secondary" @click="$router.push('/election/view')" class="text-capitalize">
                       <v-icon left>mdi-arrow-left</v-icon>
                       Back to Home
                     </v-btn>
@@ -115,10 +90,66 @@ export default {
     showOtp: false,
     loading: false,
     error: "",
-    password: ""
+    password: "",
+    resendTimer: 60,
+    canResendOtp: false,
+    timerInterval: null
   }),
+
+  computed: {
+    resendButtonText() {
+      return this.canResendOtp
+        ? 'Resend OTP'
+        : `Wait ${this.resendTimer}s`;
+    }
+  },
   methods: {
     ...mapActions("student", ["login"]),
+
+    startResendTimer() {
+      this.resendTimer = 60;
+      this.canResendOtp = false;
+
+      clearInterval(this.timerInterval);
+      this.timerInterval = setInterval(() => {
+        if (this.resendTimer > 0) {
+          this.resendTimer--;
+        } else {
+          this.canResendOtp = true;
+          clearInterval(this.timerInterval);
+        }
+      }, 1000);
+    },
+
+    async resendOtp() {
+      if (!this.canResendOtp) return;
+
+      this.loading = true;
+      try {
+        const result = await this.login({
+          studentId: this.studentId,
+          password: this.password || null,
+          email: this.email,
+          otp: null
+        });
+
+        if (result.error) {
+          this.error = result.error;
+          alert("Invalid Student ID or password");
+          if (this.error === "OTP has expired") {
+            this.showOtp = false;
+            this.startResendTimer();
+            this.otp = "";
+          }
+        } else {
+          this.$root.$emit("show-snackbar", "OTP resent successfully");
+          this.startResendTimer();
+        }
+      } finally {
+        this.loading = false;
+      }
+    },
+
     async submitLogin() {
       this.loading = true;
       this.error = "";
@@ -126,23 +157,23 @@ export default {
       try {
         const result = await this.login({
           studentId: this.studentId,
-          password: this.password,
-          // email: this.email,
-          // otp: this.showOtp ? this.otp : null,
+          password: this.password || null,
+          email: this.email,
+          otp: this.showOtp ? this.otp : null,
         });
 
-        console.log(result)
         if (result.error) {
           this.error = result.error;
           alert("Invalid Student ID or password")
-          // if (this.error === "OTP has expired") {
-          //   this.showOtp = false;
-          //   this.otp = "";
-          // }
+          if (this.error === "OTP has expired") {
+            this.showOtp = false;
+            this.otp = "";
+          }
         } else {
           this.$root.$emit("show-snackbar", result.message);
           if (result.showOtp) {
             this.showOtp = true;
+            this.startResendTimer();
           } else {
             this.$router.push("/election/portal");
           }
@@ -151,6 +182,9 @@ export default {
         this.loading = false;
       }
     },
+    beforeDestroy() {
+      clearInterval(this.timerInterval);
+    }
   },
 };
 </script>
@@ -170,9 +204,11 @@ export default {
   0% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }
+
   100% {
     background-position: 0% 50%;
   }
@@ -199,11 +235,9 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(
-    to bottom right,
-    rgba(19, 84, 122, 0.8),
-    rgba(128, 208, 199, 0.8)
-  );
+  background: linear-gradient(to bottom right,
+      rgba(19, 84, 122, 0.8),
+      rgba(128, 208, 199, 0.8));
 }
 
 .v-text-field {
@@ -219,5 +253,10 @@ export default {
 /* Ensure the container takes full height */
 .v-application--wrap {
   min-height: 100vh;
+}
+
+.v-text-field>>>.v-input__append-inner {
+  margin-top: 0;
+  padding-left: 8px;
 }
 </style>

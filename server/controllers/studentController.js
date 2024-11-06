@@ -72,11 +72,9 @@ const search = catchAsync(async (req, res, next) => {
 });
 
 const initiateLogin = catchAsync(async (req, res, next) => {
-  const { studentId, password } = req.body;
+  const { studentId, password, email } = req.body;
 
-  console.log(req.body)
-
-  const result = await SERVICE.initiateLogin(studentId, password);
+  const result = await SERVICE.initiateLogin(studentId, password, email);
 
   if (result.status === "error") {
     return next(new AppError(result.message, 400));

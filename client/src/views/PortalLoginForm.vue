@@ -7,9 +7,14 @@
           <v-card elevation="10" class="login-card mx-auto">
             <v-row no-gutters>
               <v-col cols="12" md="5" class="login-image d-none d-md-flex">
-                <v-img src="https://source.unsplash.com/random/800x1200?voting"
-                  gradient="to top right, rgba(19,84,122,.9), rgba(128,208,199,.9)" class="fill-height">
-                  <div class="image-overlay d-flex flex-column justify-center align-center text-center px-4">
+                <v-img
+                  src="https://source.unsplash.com/random/800x1200?voting"
+                  gradient="to top right, rgba(19,84,122,.9), rgba(128,208,199,.9)"
+                  class="fill-height"
+                >
+                  <div
+                    class="image-overlay d-flex flex-column justify-center align-center text-center px-4"
+                  >
                     <h2 class="text-h4 font-weight-bold white--text mb-3">
                       GITVote
                     </h2>
@@ -21,13 +26,12 @@
               </v-col>
               <v-col cols="12" md="7">
                 <v-card-text class="pa-8">
-                  <h1 class="text-h4 font-weight-bold mb-6 primary--text text-center">
+                  <h1
+                    class="text-h4 font-weight-bold mb-6 primary--text text-center"
+                  >
                     Login
                   </h1>
                   <v-form @submit.prevent="submitLogin">
-                    <v-text-field v-model="studentId" label="Student ID" prepend-inner-icon="mdi-account" outlined dense
-                      required></v-text-field>
-                    </v-text-field>
                     <!-- <v-text-field
                       v-model="password"
                       label="Password"
@@ -46,25 +50,96 @@
                       dense
                       required
                     ></v-text-field> -->
-                    <v-expand-transition>
-                      <v-text-field v-if="showOtp" v-model="otp" label="OTP" type="number" prepend-inner-icon="mdi-lock"
-                        outlined dense required>
 
+                    <v-text-field
+                      v-model="studentId"
+                      label="Student ID"
+                      prepend-inner-icon="mdi-account"
+                      outlined
+                      dense
+                      required
+                    ></v-text-field>
+
+                    <!-- Add OTP method selection -->
+                    <v-radio-group
+                      v-model="otpMethod"
+                      row
+                      class="mt-0 mb-2"
+                      v-if="!showOtp"
+                    >
+                      <v-radio
+                        label="Email"
+                        value="email"
+                        color="primary"
+                      ></v-radio>
+                      <v-radio
+                        label="SMS"
+                        value="sms"
+                        color="primary"
+                      ></v-radio>
+                    </v-radio-group>
+
+                    <v-expand-transition>
+                      <div
+                        v-if="loading || showOtp"
+                        class="text-caption text--secondary mb-4"
+                      >
+                        <v-icon small class="mr-1">mdi-information</v-icon>
+                        {{
+                          loading ? "Sending OTP to:" : "OTP has been sent to:"
+                        }}
+                        <span class="font-weight-medium">{{
+                          maskedContactInfo
+                        }}</span>
+                      </div>
+                    </v-expand-transition>
+
+                    <v-expand-transition>
+                      <v-text-field
+                        v-if="showOtp"
+                        v-model="otp"
+                        label="OTP"
+                        type="number"
+                        prepend-inner-icon="mdi-lock"
+                        outlined
+                        dense
+                        required
+                      >
                         <template v-slot:append>
-                          <v-btn text small color="primary" :disabled="!canResendOtp" @click="resendOtp" class="ml-2">
+                          <v-btn
+                            text
+                            small
+                            color="primary"
+                            :disabled="!canResendOtp"
+                            @click="resendOtp"
+                            class="ml-2"
+                          >
                             {{ resendButtonText }}
                           </v-btn>
                         </template>
-
-
                       </v-text-field>
                     </v-expand-transition>
-                    <v-btn color="primary" type="submit" block large :loading="loading" class="mt-6" elevation="2" :disabled="showOtp && !otp">
+
+                    <v-btn
+                      color="primary"
+                      type="submit"
+                      block
+                      large
+                      :loading="loading"
+                      class="mt-6"
+                      elevation="2"
+                      :disabled="showOtp ? !otp : !otpMethod"
+                    >
                       {{ showOtp ? "Verify OTP" : "Send OTP" }}
                     </v-btn>
                   </v-form>
                   <div class="mt-6 text-center">
-                    <v-btn text color="secondary" @click="$router.push('/election/view')" class="text-capitalize">
+                    <v-btn
+                      text
+                      color="secondary"
+                      @click="$router.push('/election/view')"
+                      class="text-capitalize"
+                    >
                       <v-icon left>mdi-arrow-left</v-icon>
                       Back to Home
                     </v-btn>
@@ -81,6 +156,7 @@
 
 <script>
 import { mapActions } from "vuex";
+import _ from 'lodash';
 
 export default {
   data: () => ({
@@ -93,18 +169,44 @@ export default {
     password: "",
     resendTimer: 60,
     canResendOtp: false,
-    timerInterval: null
+    timerInterval: null,
+    otpMethod: null,
+    studentEmail: "",
+    studentPhone: "",
   }),
 
   computed: {
     resendButtonText() {
-      return this.canResendOtp
-        ? 'Resend OTP'
-        : `Wait ${this.resendTimer}s`;
-    }
+      return this.canResendOtp ? "Resend OTP" : `Wait ${this.resendTimer}s`;
+    },
+
+    maskedContactInfo() {
+      if (!this.otpMethod) return "";
+
+      if (this.otpMethod === "email") {
+        const email = this.studentEmail;
+        if (!email) return "Loading...";
+
+        const [localPart, domain] = email.split("@");
+        if (localPart.length <= 2) {
+          return `${localPart[0]}***@${domain}`;
+        }
+        return `${localPart[0]}******${
+          localPart[localPart.length - 1]
+        }@${domain}`;
+      } else {
+        const phone = this.studentPhone;
+        if (!phone) return "Loading...";
+
+        const length = phone.length;
+        const prefix = phone.slice(0, 3);
+        const suffix = phone.slice(-4);
+        return `${prefix}****${suffix}`;
+      }
+    },
   },
   methods: {
-    ...mapActions("student", ["login"]),
+    ...mapActions("student", ["login", "fetchStudentInfo"]),
 
     startResendTimer() {
       this.resendTimer = 60;
@@ -130,7 +232,8 @@ export default {
           studentId: this.studentId,
           password: this.password || null,
           email: this.email,
-          otp: null
+          otp: null,
+          otpMethod: this.otpMethod,
         });
 
         if (result.error) {
@@ -151,6 +254,14 @@ export default {
     },
 
     async submitLogin() {
+      console.log({
+        studentId: this.studentId,
+        password: this.password || null,
+        email: this.email,
+        otp: this.showOtp ? this.otp : null,
+        otpMethod: this.otpMethod,
+      });
+
       this.loading = true;
       this.error = "";
 
@@ -160,17 +271,20 @@ export default {
           password: this.password || null,
           email: this.email,
           otp: this.showOtp ? this.otp : null,
+          otpMethod: this.otpMethod,
         });
 
         if (result.error) {
           this.error = result.error;
-          alert("Invalid Student ID or password")
+          alert("Invalid Student ID or password");
           if (this.error === "OTP has expired") {
             this.showOtp = false;
             this.otp = "";
           }
         } else {
-          this.$root.$emit("show-snackbar", result.message);
+          if (!this.showOtp) {
+            this.$root.$emit("show-snackbar", "OTP sent successfully");
+          }
           if (result.showOtp) {
             this.showOtp = true;
             this.startResendTimer();
@@ -184,7 +298,25 @@ export default {
     },
     beforeDestroy() {
       clearInterval(this.timerInterval);
-    }
+    },
+  },
+
+  watch: {
+    studentId: {
+      handler: _.debounce(async function (newVal) {
+        console.log(newVal);
+        if (newVal && newVal.length > 0) {
+          try {
+            const response = await this.fetchStudentInfo(newVal);
+            this.studentEmail = response.data.item.email;
+            this.studentPhone = response.data.item.phoneNo;
+          } catch (error) {
+            console.error("Error fetching student contact info:", error);
+          }
+        }
+      }, 500),
+      immediate: true,
+    },
   },
 };
 </script>
@@ -235,9 +367,11 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(to bottom right,
-      rgba(19, 84, 122, 0.8),
-      rgba(128, 208, 199, 0.8));
+  background: linear-gradient(
+    to bottom right,
+    rgba(19, 84, 122, 0.8),
+    rgba(128, 208, 199, 0.8)
+  );
 }
 
 .v-text-field {
@@ -255,8 +389,29 @@ export default {
   min-height: 100vh;
 }
 
-.v-text-field>>>.v-input__append-inner {
+.v-text-field >>> .v-input__append-inner {
   margin-top: 0;
   padding-left: 8px;
+}
+
+.v-radio-group {
+  margin-bottom: 16px;
+}
+
+.v-radio {
+  margin-right: 16px;
+}
+
+.masked-info {
+  font-family: monospace;
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.contact-info-message {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 </style>

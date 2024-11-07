@@ -11,6 +11,7 @@ const studentSchema = new mongoose.Schema(
     yearLevel: { type: String, required: true },
     gender: { type: String, required: true },
     email: { type: String, required: true },
+    phoneNo: { type: String, required: true },
     classroomId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Classroom",
@@ -23,6 +24,11 @@ const studentSchema = new mongoose.Schema(
     status: { type: String, enum: ["active", "inactive"], default: "active" },
     otp: { type: String },
     otpExpires: { type: Date },
+    otpMethod: {
+      type: String,
+      enum: ["email", "sms"],
+      default: "email",
+    },
     password: { type: String },
   },
   { timestamps: true }

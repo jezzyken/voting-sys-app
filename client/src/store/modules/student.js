@@ -35,12 +35,13 @@ const mutations = {
 };
 
 const actions = {
-  async login({ commit }, { studentId, otp }) {
+  async login({ commit }, { studentId, otp, otpMethod }) {
     try {
       let response;
       if (!otp) {
         response = await api.post("/student/initiate-login", {
           studentId,
+          otpMethod
         });
         if (response.data.status === "success") {
           return { showOtp: true, message: response.data.message };
@@ -85,12 +86,14 @@ const actions = {
     }
   },
 
-  async fetchStudentInfo({ commit, state }) {
-    if (state.studentId) {
+  async fetchStudentInfo({ commit }, studentId) {
+    if (studentId) {
       try {
-        const response = await api.get(`/api/student/${state.studentId}`);
+        const response = await api.get(`/student/${studentId}`);
         commit("SET_STUDENT_INFO", response.data);
+        return response.data
       } catch (error) {
+        console.log(error)
         commit("SET_ERROR", error.message);
       }
     }

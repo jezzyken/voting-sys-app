@@ -116,7 +116,18 @@
                   required
                 ></v-text-field>
               </v-col>
-              <v-col cols="12" sm="12" md="12">
+              <v-col cols="12" sm="6" md="4">
+                <v-text-field
+                  v-model="displayPhoneNo"
+                  label="Phone No"
+                  required
+                  :rules="[phoneRules.required, phoneRules.format]"
+                  v-mask="'+63 ###-###-####'"
+                  placeholder="+63 XXX-XXX-XXXX"
+                  @input="handlePhoneInput"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="12" md="8">
                 <v-select
                   v-model="editedItem.programId"
                   :items="programs"
@@ -202,8 +213,14 @@
 </template>
 
 <script>
+import { mask } from "vue-the-mask";
+
+
 export default {
   name: "StudentManagementPage",
+  directives: {
+    mask,
+  },
   data: () => ({
     dialog: false,
     deleteDialog: false,
@@ -221,8 +238,9 @@ export default {
       { text: "Year Level", value: "yearLevel" },
       { text: "Gender", value: "gender" },
       { text: "Email", value: "email" },
+      { text: "Phone No", value: "displayPhoneNo" },
       { text: "Program", value: "programId.programName" },
-      { text: "Classroom", value: "classroomId.name" },
+      { text: "Section", value: "classroomId.name" },
       { text: "Status", value: "status" },
       { text: "Actions", value: "actions", sortable: false },
     ],
@@ -239,6 +257,7 @@ export default {
       yearLevel: null,
       gender: null,
       email: "",
+      phoneNo: "",
       programId: null,
       classroomId: null,
       status: "active",
@@ -251,11 +270,17 @@ export default {
       yearLevel: null,
       gender: null,
       email: "",
+      phoneNo: "",
       programId: null,
       classroomId: null,
       status: "active",
     },
     showPassword: false,
+    displayPhoneNo: '', 
+    phoneRules: {
+      required: v => !!v || 'Phone number is required',
+      format: v => /^\+63 \d{3}-\d{3}-\d{4}$/.test(v) || 'Invalid phone number format'
+    },
   }),
 
   computed: {
@@ -275,7 +300,10 @@ export default {
       this.loading = true;
       try {
         const response = await this.$http.get("/student");
-        this.students = response.data.data.items;
+        this.students = response.data.data.items.map(student => ({
+          ...student,
+          displayPhoneNo: this.formatPhoneForDisplay(student.phoneNo)
+        }));
       } catch (error) {
         console.error("Error fetching students:", error);
         this.showSnackbar("Error fetching students", "error");
@@ -304,15 +332,37 @@ export default {
       }
     },
 
+    formatPhoneNumber(value) {
+      if (!value) return;
+      if (!value.startsWith("+63 ")) {
+        this.editedItem.phoneNo = "+63 " + value.replace(/^\+63\s?/, "");
+      }
+    },
+
+    formatPhoneForDisplay(phoneNo) {
+      if (!phoneNo) return '';
+      return phoneNo.replace(/(\+63)(\d{3})(\d{3})(\d{4})/, '$1 $2-$3-$4');
+    },
+
+    handlePhoneInput(value) {
+      if (!value) return;
+      if (!value.startsWith('+63 ')) {
+        this.displayPhoneNo = '+63 ' + value.replace(/^\+63\s?/, '');
+      }
+      this.editedItem.phoneNo = value.replace(/[\s-]/g, '');
+    },
+
     openCreateDialog() {
       this.editedIndex = -1;
       this.editedItem = Object.assign({}, this.defaultItem);
+      this.displayPhoneNo = ''
       this.dialog = true;
     },
 
     openEditDialog(item) {
       this.editedIndex = this.students.indexOf(item);
       this.editedItem = Object.assign({}, item);
+      this.displayPhoneNo = this.formatPhoneForDisplay(item.phoneNo);
       this.dialog = true;
     },
 
@@ -324,6 +374,7 @@ export default {
     closeDialog() {
       this.showPassword = false;
       this.dialog = false;
+      this.displayPhoneNo = '';
       this.$nextTick(() => {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
@@ -336,18 +387,19 @@ export default {
         this.editedItem = Object.assign({}, this.defaultItem);
       });
     },
-
     async saveStudent() {
       try {
+        const studentData = {
+          ...this.editedItem,
+          phoneNo: this.editedItem.phoneNo.replace(/[\s-]/g, '')
+        };
+
         if (this.editedIndex > -1) {
-          await this.$http.put(
-            `/student/${this.editedItem._id}`,
-            this.editedItem
-          );
-          Object.assign(this.students[this.editedIndex], this.editedItem);
+          await this.$http.put(`/student/${studentData._id}`, studentData);
+          Object.assign(this.students[this.editedIndex], studentData);
           this.showSnackbar("Student updated successfully", "success");
         } else {
-          const response = await this.$http.post("/student", this.editedItem);
+          const response = await this.$http.post("/student", studentData);
           this.students.push(response.data.data.item);
           this.showSnackbar("Student created successfully", "success");
         }

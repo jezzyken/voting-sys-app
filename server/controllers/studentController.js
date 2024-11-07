@@ -16,6 +16,8 @@ const getAll = catchAsync(async (req, res, next) => {
 });
 
 const getById = catchAsync(async (req, res, next) => {
+  console.log("get by student id");
+  console.log(req.params.id)
   const item = await SERVICE.getById(req.params.id);
   if (!item) {
     return next(new AppError("Student not found", 404));
@@ -72,9 +74,13 @@ const search = catchAsync(async (req, res, next) => {
 });
 
 const initiateLogin = catchAsync(async (req, res, next) => {
-  const { studentId, password, email } = req.body;
-
-  const result = await SERVICE.initiateLogin(studentId, password, email);
+  const { studentId, password, email, otpMethod } = req.body;
+  const result = await SERVICE.initiateLogin(
+    studentId,
+    password,
+    email,
+    otpMethod
+  );
 
   if (result.status === "error") {
     return next(new AppError(result.message, 400));

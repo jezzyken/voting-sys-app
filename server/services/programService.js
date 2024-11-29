@@ -10,6 +10,7 @@ const getById = async (id) => {
 
 const add = async (data) => {
     const newItem = new MODEL(data);
+    console.log(newItem)
     return await newItem.save();
 };
 

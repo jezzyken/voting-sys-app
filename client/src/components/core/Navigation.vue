@@ -115,7 +115,7 @@ export default {
           path: "/section",
           icon: "mdi-google-classroom",
         },
-        { title: "Programs", path: "/programs", icon: "mdi-book-education" },
+        { title: "Courses", path: "/courses", icon: "mdi-book-education" },
         { title: "Students", path: "/students", icon: "mdi-account-school" },
         { title: "Party", path: "/party", icon: "mdi-account-group" },
         { title: "Elections", path: "/elections", icon: "mdi-vote" },

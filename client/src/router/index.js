@@ -33,8 +33,8 @@ const routes = [
         component: () => import("../views/AddUser.vue"),
       },
       {
-        path: "programs",
-        name: "Programs",
+        path: "courses",
+        name: "Courses",
         component: () => import("../views/Programs.vue"),
       },
       {

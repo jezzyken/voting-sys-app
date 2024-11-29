@@ -147,7 +147,7 @@
               <v-col cols="12">
                 <v-select
                   v-model="editedItem.electionType"
-                  :items="['SSC', 'Classroom']"
+                  :items="['SSC']"
                   label="Election Type"
                   required
                   @change="handleElectionTypeChange"
@@ -267,6 +267,7 @@ export default {
   created() {
     this.fetchElections();
     this.fetchClassrooms();
+    this.fetchParties()
   },
 
   methods: {
@@ -277,6 +278,17 @@ export default {
       } catch (error) {
         console.error("Error fetching classrooms:", error);
         this.showSnackbar("Error fetching classrooms", "error");
+      }
+    },
+
+    async fetchParties() {
+      try {
+        const response = await this.$http.get("/party");
+        console.log({parties: response});
+        this.parties = response.data.data.items;
+      } catch (error) {
+        console.error("Error fetching parties:", error);
+        this.showSnackbar("Error fetching parties", "error");
       }
     },
 

@@ -133,7 +133,7 @@
                   :items="programs"
                   item-text="programName"
                   item-value="_id"
-                  label="Program"
+                  label="Course"
                   required
                 ></v-select>
               </v-col>
@@ -156,7 +156,7 @@
               </v-col>
             </v-row>
 
-            <v-divider class="my-5"></v-divider>
+            <!-- <v-divider class="my-5"></v-divider>
             <v-row>
               <v-col cols="12">
                 <v-alert color="info" border="left" colored-border dense>
@@ -177,7 +177,7 @@
                   dense
                 ></v-text-field>
               </v-col>
-            </v-row>
+            </v-row> -->
           </v-container>
         </v-card-text>
 
@@ -239,7 +239,7 @@ export default {
       { text: "Gender", value: "gender" },
       { text: "Email", value: "email" },
       { text: "Phone No", value: "displayPhoneNo" },
-      { text: "Program", value: "programId.programName" },
+      { text: "Course", value: "programId.programName" },
       { text: "Section", value: "classroomId.name" },
       { text: "Status", value: "status" },
       { text: "Actions", value: "actions", sortable: false },
@@ -317,8 +317,8 @@ export default {
         const response = await this.$http.get("/program");
         this.programs = response.data.data.items;
       } catch (error) {
-        console.error("Error fetching programs:", error);
-        this.showSnackbar("Error fetching programs", "error");
+        console.error("Error fetching courses:", error);
+        this.showSnackbar("Error fetching courses", "error");
       }
     },
 

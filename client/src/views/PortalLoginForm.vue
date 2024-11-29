@@ -254,13 +254,6 @@ export default {
     },
 
     async submitLogin() {
-      console.log({
-        studentId: this.studentId,
-        password: this.password || null,
-        email: this.email,
-        otp: this.showOtp ? this.otp : null,
-        otpMethod: this.otpMethod,
-      });
 
       this.loading = true;
       this.error = "";

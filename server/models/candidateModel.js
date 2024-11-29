@@ -13,6 +13,10 @@ const candidateSchema = new mongoose.Schema(
       required: true,
     },
     position: { type: String, required: true },
+    partyId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Party",
+    },
     manifesto: { type: String, required: true },
     imageUrl: { type: String, required: true },
   },

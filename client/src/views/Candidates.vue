@@ -111,6 +111,15 @@
                 :rules="[(v) => !!v || 'Position is required']"
               ></v-select>
 
+              <v-select
+                v-model="editedItem.partyId"
+                :items="parties"
+                item-text="name"
+                item-value="_id"
+                label="Select Party"
+                required
+              ></v-select>
+
               <v-file-input
                 v-model="imageFile"
                 accept="image/*"
@@ -218,14 +227,14 @@ export default {
       studentId: "",
       electionId: "",
       position: "",
-      partyId: "",
-      manifesto: "",
+      partyId: null,
+      manifesto: null,
     },
     defaultItem: {
       studentId: "",
       electionId: "",
       position: "",
-      partyId: "",
+      partyId: null,
       manifesto: "",
     },
     imageFile: null,
@@ -241,6 +250,7 @@ export default {
     this.fetchCandidates();
     this.fetchStudents();
     this.fetchElections();
+    this.fetchParties();
     console.log("Current environment:", currentEnv);
     console.log("API Base URL:", baseURL);
   },
@@ -280,6 +290,16 @@ export default {
         this.elections = response.data.data.items;
       } catch (error) {
         console.error("Error fetching elections:", error);
+      }
+    },
+
+    async fetchParties() {
+      try {
+        const response = await this.$http.get("/party");
+        this.parties = response.data.data.items;
+      } catch (error) {
+        console.error("Error fetching parties:", error);
+        this.showSnackbar("Error fetching parties", "error");
       }
     },
 

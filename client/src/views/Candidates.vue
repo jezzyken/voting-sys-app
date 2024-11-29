@@ -125,7 +125,6 @@
                 accept="image/*"
                 label="Candidate Image"
                 prepend-icon="mdi-camera"
-               :rules="[(v) => !!v || 'Campaign Message is required']"
               ></v-file-input>
 
               <v-img
@@ -261,6 +260,8 @@ export default {
       this.loading = true;
       try {
         const response = await this.$http.get("/candidate");
+
+        console.log(response);
         this.candidates = response.data.data.items.map((item) => ({
           ...item,
           studentName: `${item.studentId.lastName}, ${item.studentId.firstName} ${item.studentId.middleName}`,
@@ -312,7 +313,7 @@ export default {
 
     openEditDialog(item) {
       this.positions = this.elections
-        .filter((e) => e._id === item.electionId._id)
+        .filter((e) => e._id === item.electionId?._id)
         .map((item) => item.positions)[0];
       this.editedIndex = this.candidates.indexOf(item);
       this.editedItem = Object.assign({}, item);
@@ -353,8 +354,8 @@ export default {
 
           if (
             this.imageFile &&
-            (this.editedIndex === -1 || 
-              this.imageFile !== this.editedItem.image) 
+            (this.editedIndex === -1 ||
+              this.imageFile !== this.editedItem.image)
           ) {
             formData.append("image", this.imageFile);
           }
@@ -364,7 +365,7 @@ export default {
           if (this.editedIndex > -1) {
             response = await this.$http.put(
               `/candidate/${this.editedItem._id}`,
-              this.editedItem,
+              this.editedItem
             );
             Object.assign(
               this.candidates[this.editedIndex],

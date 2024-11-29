@@ -158,7 +158,7 @@
             <p class="mb-6">
               Learn about the candidates running for various positions.
             </p>
-            <v-btn color="info" large rounded @click="viewCandidates">
+            <v-btn color="primary" large rounded dark @click="viewCandidates">
               <v-icon left>mdi-account-details</v-icon>
               Meet the Candidates
             </v-btn>

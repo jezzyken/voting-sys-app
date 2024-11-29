@@ -30,9 +30,9 @@
       </v-col>
 
       <v-col cols="12" sm="6" md="3">
-        <v-card class="mx-auto stat-card" color="info" dark height="150">
+        <v-card class="mx-auto stat-card" color="teal darken-1" dark height="150">
           <v-card-text>
-            <div class="text-h6 card-title">Total Students</div>
+            <div class="text-h6 card-title">Total Studentsss</div>
             <div class="text-h4 mt-4">{{ statistics.totalStudents }}</div>
             <div class="mt-4">
               <v-chip x-small> {{ statistics.activeStudents }} Active </v-chip>

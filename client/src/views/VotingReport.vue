@@ -87,7 +87,7 @@
           </v-col>
 
           <v-col cols="12" sm="6" md="3">
-            <v-card outlined class="summary-card info">
+            <v-card outlined class="summary-card teal darken-1">
               <v-card-text class="text-center py-6">
                 <div class="text-subtitle-1 white--text mb-2">
                   Voting Progress

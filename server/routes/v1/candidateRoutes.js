@@ -11,6 +11,7 @@ router.get("/election/:id", CONTROLLER.getByElectionId);
 router.post("/", upload.single("image"), CONTROLLER.add);
 router.put("/:id", CONTROLLER.update);
 router.delete("/:id", CONTROLLER.remove);
+
 router.get('/ongoing/election/:electionId', async (req, res) => {
   console.log('election')
   try {
@@ -18,7 +19,10 @@ router.get('/ongoing/election/:electionId', async (req, res) => {
     
     const candidates = await MODEL.find({ electionId })
       .populate('studentId', 'firstName middleName lastName')
+      .populate('partyId')
       .sort('position');
+
+      console.log(candidates)
 
     res.json(candidates);
   } catch (error) {

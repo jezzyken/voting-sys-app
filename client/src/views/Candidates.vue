@@ -125,6 +125,7 @@
                 accept="image/*"
                 label="Candidate Image"
                 prepend-icon="mdi-camera"
+               :rules="[(v) => !!v || 'Campaign Message is required']"
               ></v-file-input>
 
               <v-img
@@ -145,7 +146,7 @@
                 v-model="editedItem.manifesto"
                 label="Campaign Message"
                 required
-                :rules="[(v) => !!v || 'Manifesto is required']"
+                :rules="[(v) => !!v || 'Campaign Message is required']"
               ></v-textarea>
             </v-form>
           </v-container>
@@ -344,40 +345,42 @@ export default {
         try {
           const formData = new FormData();
           Object.keys(this.editedItem).forEach((key) => {
-            if (key !== "studentId") {
+            if (key !== "studentId" && key !== "image") {
               formData.append(key, this.editedItem[key]);
             }
           });
           formData.append("studentId", this.editedItem.studentId._id);
 
-          if (this.imageFile) {
+          if (
+            this.imageFile &&
+            (this.editedIndex === -1 || 
+              this.imageFile !== this.editedItem.image) 
+          ) {
             formData.append("image", this.imageFile);
           }
 
           let response;
+
           if (this.editedIndex > -1) {
             response = await this.$http.put(
               `/candidate/${this.editedItem._id}`,
-              formData,
-              {
-                headers: {
-                  "Content-Type": "multipart/form-data",
-                },
-              }
+              this.editedItem,
             );
             Object.assign(
               this.candidates[this.editedIndex],
               response.data.data.item
             );
             this.showSnackbar("Candidate updated successfully", "success");
+            this.fetchCandidates();
           } else {
             response = await this.$http.post("/candidate", formData, {
               headers: {
                 "Content-Type": "multipart/form-data",
               },
             });
-            this.candidates.push(response.data.data.item);
+            // this.candidates.push(response.data.data.item);
             this.showSnackbar("Candidacy filed successfully", "success");
+            this.fetchCandidates();
           }
           this.closeDialog();
         } catch (error) {

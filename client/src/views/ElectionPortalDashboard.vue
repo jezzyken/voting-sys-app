@@ -231,7 +231,7 @@ export default {
       }
     },
     viewCandidates() {
-      this.$router.push("/election/candidates");
+      this.$router.push("/election/portal/candidates");
     },
     async fetchOngoingElections() {
       this.loading = true;

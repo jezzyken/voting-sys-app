@@ -3,9 +3,17 @@ const UPLOAD = require("../config/cloudinary");
 const ObjectId = require("mongoose").Types.ObjectId;
 
 const getAll = async () => {
-  return await MODEL.find()
+  const results = await MODEL.find()
     .populate("studentId", "firstName middleName lastName lrn")
-    .populate("electionId", "name");
+    .populate("electionId");
+
+  const filteredItems = results.filter(
+    (item) => item.electionId.status !== "completed"
+  );
+
+  console.log(filteredItems);
+
+  return filteredItems;
 };
 
 const getById = async (id) => {
@@ -21,7 +29,7 @@ const getByElectionId = async (req) => {
     },
     {
       $lookup: {
-        from: "students", 
+        from: "students",
         localField: "studentId",
         foreignField: "_id",
         as: "student",
@@ -40,11 +48,7 @@ const getByElectionId = async (req) => {
                 " ",
                 { $ifNull: ["$student.middleName", ""] },
                 {
-                  $cond: [
-                    { $eq: ["$student.middleName", null] },
-                    "",
-                    " ",
-                  ],
+                  $cond: [{ $eq: ["$student.middleName", null] }, "", " "],
                 },
                 "$student.lastName",
               ],
@@ -69,7 +73,7 @@ const getByElectionId = async (req) => {
     },
   ]);
 
-  return candidates
+  return candidates;
 };
 
 const add = async (data, image) => {

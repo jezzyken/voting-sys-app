@@ -32,7 +32,7 @@
       <v-col cols="12" sm="6" md="3">
         <v-card class="mx-auto stat-card" color="teal darken-1" dark height="150">
           <v-card-text>
-            <div class="text-h6 card-title">Total Studentsss</div>
+            <div class="text-h6 card-title">Total Students</div>
             <div class="text-h4 mt-4">{{ statistics.totalStudents }}</div>
             <div class="mt-4">
               <v-chip x-small> {{ statistics.activeStudents }} Active </v-chip>
@@ -46,16 +46,12 @@
           <v-card-text>
             <div class="text-h6 card-title d-flex align-center">
               Current Election Votes
-              <v-chip
-                x-small
-                class="ml-2"
-                style="
+              <v-chip x-small class="ml-2" style="
                   max-width: 120px;
                   white-space: nowrap;
                   overflow: hidden;
                   text-overflow: ellipsis;
-                "
-              >
+                ">
                 {{ statistics.currentElection }}
               </v-chip>
             </div>
@@ -79,21 +75,12 @@
           </v-card-title>
           <v-card-text class="chart-container">
             <div class="chart-wrapper">
-              <line-chart
-                v-if="!loading && votingTrendsData.datasets[0].data.length > 0"
-                :chart-data="votingTrendsData"
-                :options="chartOptions"
-              ></line-chart>
-              <div
-                v-else-if="loading"
-                class="d-flex justify-center align-center fill-height"
-              >
+              <line-chart v-if="!loading && votingTrendsData.datasets[0].data.length > 0" :chart-data="votingTrendsData"
+                :options="chartOptions"></line-chart>
+              <div v-else-if="loading" class="d-flex justify-center align-center fill-height">
                 <v-progress-circular indeterminate></v-progress-circular>
               </div>
-              <div
-                v-else
-                class="d-flex justify-center align-center fill-height"
-              >
+              <div v-else class="d-flex justify-center align-center fill-height">
                 No voting data available
               </div>
             </div>
@@ -109,24 +96,14 @@
           </v-card-title>
           <v-card-text class="chart-container">
             <div class="chart-wrapper">
-              <pie-chart
-                v-if="
-                  !loading &&
-                  participationData.datasets[0].data.some((value) => value > 0)
-                "
-                :chart-data="participationData"
-                :options="pieChartOptions"
-              ></pie-chart>
-              <div
-                v-else-if="loading"
-                class="d-flex justify-center align-center fill-height"
-              >
+              <pie-chart v-if="
+                !loading &&
+                participationData.datasets[0].data.some((value) => value > 0)
+              " :chart-data="participationData" :options="pieChartOptions"></pie-chart>
+              <div v-else-if="loading" class="d-flex justify-center align-center fill-height">
                 <v-progress-circular indeterminate></v-progress-circular>
               </div>
-              <div
-                v-else
-                class="d-flex justify-center align-center fill-height"
-              >
+              <div v-else class="d-flex justify-center align-center fill-height">
                 No participation data available
               </div>
             </div>
@@ -141,24 +118,12 @@
           <v-card-title>
             Current Elections
             <v-spacer></v-spacer>
-            <v-text-field
-              v-model="search"
-              append-icon="mdi-magnify"
-              label="Search"
-              single-line
-              hide-details
-              dense
-            ></v-text-field>
+            <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line hide-details
+              dense></v-text-field>
           </v-card-title>
 
-          <v-data-table
-            :headers="electionHeaders"
-            :items="currentElections"
-            :search="search"
-            :items-per-page="5"
-            :loading="loading"
-            class="elevation-1"
-          >
+          <v-data-table :headers="electionHeaders" :items="currentElections" :search="search" :items-per-page="5"
+            :loading="loading" class="elevation-1">
             <template v-slot:item.status="{ item }">
               <v-chip :color="getStatusColor(item.status)" small dark label>
                 {{ item.status }}
@@ -167,12 +132,7 @@
 
             <template v-slot:item.progress="{ item }">
               <div class="d-flex align-center">
-                <v-progress-linear
-                  :value="item.progress"
-                  :color="getProgressColor(item.progress)"
-                  height="20"
-                  rounded
-                >
+                <v-progress-linear :value="item.progress" :color="getProgressColor(item.progress)" height="20" rounded>
                   <template v-slot:default>
                     {{ Math.ceil(item.progress) }}%
                   </template>
@@ -183,14 +143,7 @@
             <template v-slot:item.actions="{ item }">
               <v-tooltip bottom v-if="item.status === 'completed'">
                 <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    small
-                    icon
-                    color="primary"
-                    v-bind="attrs"
-                    v-on="on"
-                    @click="viewElectionResults(item)"
-                  >
+                  <v-btn small icon color="primary" v-bind="attrs" v-on="on" @click="viewElectionResults(item)">
                     <v-icon>mdi-poll</v-icon>
                   </v-btn>
                 </template>
@@ -528,11 +481,11 @@ export default {
   width: 100%;
 }
 
-.v-data-table >>> .v-data-table__wrapper {
+.v-data-table>>>.v-data-table__wrapper {
   overflow-x: auto;
 }
 
-.v-data-table >>> .v-data-table__progress {
+.v-data-table>>>.v-data-table__progress {
   margin: 0;
 }
 

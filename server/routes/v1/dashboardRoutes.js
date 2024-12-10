@@ -161,9 +161,18 @@ router.get("/participation-stats", async (req, res) => {
 });
 
 router.get("/current-elections", async (req, res) => {
-  console.log("showing current elections");
   try {
-    const currentElections = await Election.find({})
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+    const currentElections = await Election.find({
+      $or: [
+        { status: { $ne: "completed" } },
+        {
+          $and: [{ status: "completed" }, { updatedAt: { $gte: oneWeekAgo } }],
+        },
+      ],
+    })
       .sort({ createdAt: -1 })
       .limit(10);
 
@@ -206,8 +215,6 @@ router.get("/current-elections", async (req, res) => {
         };
       })
     );
-
-    console.log(electionsWithDetails);
 
     res.json(electionsWithDetails);
   } catch (error) {

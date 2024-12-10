@@ -4,47 +4,22 @@
       <v-card-title class="headline">
         Candidates
         <v-spacer></v-spacer>
-        <v-text-field
-          v-model="search"
-          prepend-inner-icon="mdi-magnify"
-          label="Search candidates"
-          clearable
-          outlined
-          rounded
-          dense
-          hide-details
-          class="mr-4"
-          style="max-width: 300px"
-        ></v-text-field>
-        <v-btn color="primary" @click="openCreateDialog">
+        <v-text-field v-model="search" prepend-inner-icon="mdi-magnify" label="Search candidates" clearable outlined
+          rounded dense hide-details class="mr-4" style="max-width: 300px"></v-text-field>
+        <v-btn color="primary" @click="openCreateDialog" :disabled="!hasActiveElections">
           <v-icon left>mdi-plus</v-icon>
           File Candidacy
         </v-btn>
       </v-card-title>
 
-      <v-data-table
-        :headers="headers"
-        :items="candidates"
-        :search="search"
-        :items-per-page="10"
-        class="elevation-1"
-        :loading="loading"
-        loading-text="Loading candidates... Please wait"
-        no-data-text="No candidates found"
-        :footer-props="{
+      <v-data-table :headers="headers" :items="candidates" :search="search" :items-per-page="10" class="elevation-1"
+        :loading="loading" loading-text="Loading candidates... Please wait" :no-data-text="noDataText" :footer-props="{
           'items-per-page-options': [5, 10, 15, 20],
-        }"
-      >
+        }">
         <template v-slot:item="{ item, index }">
           <tr :class="index % 2 === 0 ? 'grey lighten-4' : ''">
             <td>
-              <img
-                :src="item.imageUrl"
-                alt="Student Image"
-                width="50"
-                height="50"
-                class="ma-2"
-              />
+              <img :src="item.imageUrl" alt="Student Image" width="50" height="50" class="ma-2" />
             </td>
             <td>{{ item.studentName }}</td>
             <td>{{ item.position }}</td>
@@ -72,67 +47,29 @@
         <v-card-text>
           <v-container>
             <v-form ref="form" v-model="valid" lazy-validation>
-              <v-autocomplete
-                v-model="editedItem.studentId"
-                :items="students"
-                item-text="name"
-                item-value="_id"
-                label="Search Student"
-                placeholder="Start typing to search"
-                prepend-icon="mdi-database-search"
-                return-object
-                required
-                :rules="[(v) => !!v || 'Student is required']"
-              >
+              <v-autocomplete v-model="editedItem.studentId" :items="students" item-text="name" item-value="_id"
+                label="Search Student" placeholder="Start typing to search" prepend-icon="mdi-database-search"
+                return-object required :rules="[(v) => !!v || 'Student is required']">
                 <template v-slot:item="{ item }">
                   <v-list-item-content>
                     <v-list-item-title v-text="item.name"></v-list-item-title>
-                    <v-list-item-subtitle
-                      v-text="item.lrn"
-                    ></v-list-item-subtitle>
+                    <v-list-item-subtitle v-text="item.lrn"></v-list-item-subtitle>
                   </v-list-item-content>
                 </template>
               </v-autocomplete>
-              <v-select
-                v-model="editedItem.electionId"
-                :items="elections"
-                item-text="name"
-                item-value="_id"
-                label="Election"
-                required
-                @change="onSelectElection"
-                :rules="[(v) => !!v || 'Election is required']"
-              ></v-select>
-              <v-select
-                v-model="editedItem.position"
-                :items="positions"
-                label="Position"
-                required
-                :rules="[(v) => !!v || 'Position is required']"
-              ></v-select>
+              <v-select v-model="editedItem.electionId" :items="elections" item-text="name" item-value="_id"
+                label="Election" required @change="onSelectElection"
+                :rules="[(v) => !!v || 'Election is required']"></v-select>
+              <v-select v-model="editedItem.position" :items="positions" label="Position" required
+                :rules="[(v) => !!v || 'Position is required']"></v-select>
 
-              <v-select
-                v-model="editedItem.partyId"
-                :items="parties"
-                item-text="name"
-                item-value="_id"
-                label="Select Party"
-                required
-              ></v-select>
+              <v-select v-model="editedItem.partyId" :items="parties" item-text="name" item-value="_id"
+                label="Select Party" required></v-select>
 
-              <v-file-input
-                v-model="imageFile"
-                accept="image/*"
-                label="Candidate Image"
-                prepend-icon="mdi-camera"
-              ></v-file-input>
+              <v-file-input v-model="imageFile" accept="image/*" label="Candidate Image"
+                prepend-icon="mdi-camera"></v-file-input>
 
-              <v-img
-                v-if="editedItem.imageUrl"
-                :src="editedItem.imageUrl"
-                max-height="200"
-                contain
-              ></v-img>
+              <v-img v-if="editedItem.imageUrl" :src="editedItem.imageUrl" max-height="200" contain></v-img>
 
               <!-- <v-select
                 v-model="editedItem.partyId"
@@ -141,12 +78,8 @@
                 item-value="_id"
                 label="Party"
               ></v-select> -->
-              <v-textarea
-                v-model="editedItem.manifesto"
-                label="Campaign Message"
-                required
-                :rules="[(v) => !!v || 'Campaign Message is required']"
-              ></v-textarea>
+              <v-textarea v-model="editedItem.manifesto" label="Campaign Message" required
+                :rules="[(v) => !!v || 'Campaign Message is required']"></v-textarea>
             </v-form>
           </v-container>
         </v-card-text>
@@ -162,17 +95,11 @@
     <v-dialog v-model="deleteDialog" max-width="500px">
       <v-card>
         <v-card-title class="headline">Delete Candidate</v-card-title>
-        <v-card-text
-          >Are you sure you want to delete this candidate?</v-card-text
-        >
+        <v-card-text>Are you sure you want to delete this candidate?</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="closeDeleteDialog"
-            >Cancel</v-btn
-          >
-          <v-btn color="red darken-1" text @click="deleteCandidate"
-            >Delete</v-btn
-          >
+          <v-btn color="blue darken-1" text @click="closeDeleteDialog">Cancel</v-btn>
+          <v-btn color="red darken-1" text @click="deleteCandidate">Delete</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -244,6 +171,15 @@ export default {
     formTitle() {
       return this.editedIndex === -1 ? "File Candidacy" : "Edit Candidate";
     },
+    hasActiveElections() {
+      return this.elections.some(election => election.status !== 'completed');
+    },
+    noDataText() {
+      if (!this.hasActiveElections) {
+        return "No active elections available for candidacy";
+      }
+      return "No candidates found";
+    },
   },
 
   created() {
@@ -261,11 +197,14 @@ export default {
       try {
         const response = await this.$http.get("/candidate");
 
-        console.log(response);
-        this.candidates = response.data.data.items.map((item) => ({
-          ...item,
-          studentName: `${item.studentId.lastName}, ${item.studentId.firstName} ${item.studentId.middleName}`,
-        }));
+        console.log(response)
+
+        this.candidates = response.data.data.items
+          .filter(item => item.electionId.status !== 'completed')
+          .map((item) => ({
+            ...item,
+            studentName: `${item.studentId.lastName}, ${item.studentId.firstName} ${item.studentId.middleName}`,
+          }));
       } catch (error) {
         console.error("Error fetching candidates:", error);
         this.showSnackbar("Error fetching candidates", "error");
@@ -289,7 +228,9 @@ export default {
     async fetchElections() {
       try {
         const response = await this.$http.get("/election");
-        this.elections = response.data.data.items;
+        this.elections = response.data.data.items.filter(
+          election => election.status !== 'completed'
+        );
       } catch (error) {
         console.error("Error fetching elections:", error);
       }

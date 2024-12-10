@@ -22,19 +22,26 @@
       </v-col>
     </v-row>
 
+    <v-row class="mb-4">
+      <v-col cols="12" class="d-flex">
+        <v-btn color="primary" outlined @click="$router.go(-1)">
+          <v-icon left>mdi-arrow-left</v-icon>
+          Back
+        </v-btn>
+
+        <v-spacer></v-spacer>
+
+        <v-btn color="primary" outlined class="ml-2" @click="printResults">
+          <v-icon left>mdi-printer</v-icon>
+          Print Results
+        </v-btn>
+      </v-col>
+    </v-row>
+
     <!-- Loading State -->
-    <v-row
-      v-if="loading"
-      justify="center"
-      align="center"
-      style="min-height: 400px"
-    >
+    <v-row v-if="loading" justify="center" align="center" style="min-height: 400px">
       <v-col cols="12" class="text-center">
-        <v-progress-circular
-          indeterminate
-          size="64"
-          color="primary"
-        ></v-progress-circular>
+        <v-progress-circular indeterminate size="64" color="primary"></v-progress-circular>
         <div class="mt-4 text-subtitle-1">Loading Results...</div>
       </v-col>
     </v-row>
@@ -48,18 +55,11 @@
     </v-alert>
 
     <!-- No Results State -->
-    <v-row
-      v-else-if="!hasResults"
-      justify="center"
-      align="center"
-      style="min-height: 400px"
-    >
+    <v-row v-else-if="!hasResults" justify="center" align="center" style="min-height: 400px">
       <v-col cols="12" md="6" class="text-center">
         <v-card outlined>
           <v-card-text>
-            <v-icon size="64" color="grey lighten-1"
-              >mdi-poll-box-outline</v-icon
-            >
+            <v-icon size="64" color="grey lighten-1">mdi-poll-box-outline</v-icon>
             <h3 class="text-h6 grey--text text--darken-1 mt-4">
               No Results Available
             </h3>
@@ -80,24 +80,14 @@
               <v-icon left color="primary">mdi-account-group</v-icon>
               {{ position.toUpperCase() }}
               <v-spacer></v-spacer>
-              <v-chip
-                small
-                :color="getWinnerChipColor(candidates)"
-                class="ml-2"
-              >
+              <v-chip small :color="getWinnerChipColor(candidates)" class="ml-2">
                 {{ getWinnerChipText(candidates) }}
               </v-chip>
             </v-card-title>
 
             <v-card-text class="pt-4">
               <!-- Winner Banner -->
-              <v-alert
-                v-if="getWinner(candidates)"
-                color="success"
-                outlined
-                dense
-                class="mb-4"
-              >
+              <v-alert v-if="getWinner(candidates)" color="success" outlined dense class="mb-4">
                 <v-row align="center" no-gutters>
                   <v-col cols="auto" class="mr-3">
                     <v-avatar size="48">
@@ -125,20 +115,12 @@
 
               <!-- Chart -->
               <div class="chart-container mb-6">
-                <bar-chart
-                  :chart-data="getChartData(candidates)"
-                  :options="chartOptions"
-                  :height="250"
-                />
+                <bar-chart :chart-data="getChartData(candidates)" :options="chartOptions" :height="250" />
               </div>
 
               <!-- Results Table -->
-              <v-data-table
-                :headers="tableHeaders"
-                :items="getTableItems(candidates)"
-                hide-default-footer
-                class="elevation-1"
-              >
+              <v-data-table :headers="tableHeaders" :items="getTableItems(candidates)" hide-default-footer
+                class="elevation-1">
                 <template v-slot:item.rank="{ item }">
                   <v-chip x-small :color="getRankColor(item.rank)" dark>
                     {{ item.rank }}
@@ -159,11 +141,7 @@
                 </template>
 
                 <template v-slot:item.percentage="{ item }">
-                  <v-progress-linear
-                    :value="item.percentage"
-                    height="20"
-                    :color="getProgressColor(item.rank)"
-                  >
+                  <v-progress-linear :value="item.percentage" height="20" :color="getProgressColor(item.rank)">
                     <template v-slot:default> {{ item.percentage }}% </template>
                   </v-progress-linear>
                 </template>
@@ -176,11 +154,7 @@
                   </v-expansion-panel-header>
 
                   <v-expansion-panel-content>
-                    <v-tabs
-                      v-model="activeTab"
-                      background-color="transparent"
-                      color="primary"
-                    >
+                    <v-tabs v-model="activeTab" background-color="transparent" color="primary">
                       <v-tab>
                         <v-icon left>mdi-school</v-icon>
                         By Course
@@ -195,18 +169,10 @@
                       <v-tab-item>
                         <v-card flat>
                           <v-card-text>
-                            <div
-                              v-for="candidate in getTableItems(candidates)"
-                              :key="candidate.studentName"
-                            >
+                            <div v-for="candidate in getTableItems(candidates)" :key="candidate.studentName">
                               <h3 class="subtitle-1 font-weight-bold mb-2">
                                 {{ candidate.studentName }}
-                                <v-chip
-                                  small
-                                  :color="getRankColor(candidate.rank)"
-                                  dark
-                                  class="ml-2"
-                                >
+                                <v-chip small :color="getRankColor(candidate.rank)" dark class="ml-2">
                                   {{ candidate.votes }} votes
                                 </v-chip>
                               </h3>
@@ -221,29 +187,20 @@
                                     </tr>
                                   </thead>
                                   <tbody>
-                                    <tr
-                                      v-for="program in getProgramBreakdown(
-                                        candidate
-                                      )"
-                                      :key="program.programId"
-                                    >
+                                    <tr v-for="program in getProgramBreakdown(
+                                      candidate
+                                    )" :key="program.programId">
                                       <td>{{ program.programName }}</td>
                                       <td class="text-center">
                                         {{ program.votes }}
                                       </td>
                                       <td class="text-right">
-                                        <v-progress-linear
-                                          :value="
-                                            calculateProgramPercentage(
-                                              program.votes,
-                                              candidate.votes
-                                            )
-                                          "
-                                          height="20"
-                                          :color="
-                                            getProgressColor(candidate.rank)
-                                          "
-                                        >
+                                        <v-progress-linear :value="calculateProgramPercentage(
+                                          program.votes,
+                                          candidate.votes
+                                        )
+                                          " height="20" :color="getProgressColor(candidate.rank)
+                                            ">
                                           <template v-slot:default>
                                             {{
                                               calculateProgramPercentage(
@@ -268,18 +225,10 @@
                       <v-tab-item>
                         <v-card flat>
                           <v-card-text>
-                            <div
-                              v-for="candidate in getTableItems(candidates)"
-                              :key="candidate.studentName"
-                            >
+                            <div v-for="candidate in getTableItems(candidates)" :key="candidate.studentName">
                               <h3 class="subtitle-1 font-weight-bold mb-2">
                                 {{ candidate.studentName }}
-                                <v-chip
-                                  small
-                                  :color="getRankColor(candidate.rank)"
-                                  dark
-                                  class="ml-2"
-                                >
+                                <v-chip small :color="getRankColor(candidate.rank)" dark class="ml-2">
                                   {{ candidate.votes }} votes
                                 </v-chip>
                               </h3>
@@ -294,29 +243,20 @@
                                     </tr>
                                   </thead>
                                   <tbody>
-                                    <tr
-                                      v-for="year in getYearLevelBreakdown(
-                                        candidate
-                                      )"
-                                      :key="year.yearLevel"
-                                    >
+                                    <tr v-for="year in getYearLevelBreakdown(
+                                      candidate
+                                    )" :key="year.yearLevel">
                                       <td>{{ year.yearLevel }}</td>
                                       <td class="text-center">
                                         {{ year.votes }}
                                       </td>
                                       <td class="text-right">
-                                        <v-progress-linear
-                                          :value="
-                                            calculateProgramPercentage(
-                                              year.votes,
-                                              candidate.votes
-                                            )
-                                          "
-                                          height="20"
-                                          :color="
-                                            getProgressColor(candidate.rank)
-                                          "
-                                        >
+                                        <v-progress-linear :value="calculateProgramPercentage(
+                                          year.votes,
+                                          candidate.votes
+                                        )
+                                          " height="20" :color="getProgressColor(candidate.rank)
+                                            ">
                                           <template v-slot:default>
                                             {{
                                               calculateProgramPercentage(
@@ -346,22 +286,12 @@
       </v-row>
     </template>
 
-    <v-btn
-      color="primary"
-      outlined
-      class="mt-4"
-      :to="{ path: '/election/portal' }"
-    >
+    <v-btn color="primary" outlined class="mt-4" :to="{ path: '/election/portal' }">
       <v-icon left>mdi-arrow-left</v-icon>
       Back to Elections
     </v-btn>
 
-    <v-snackbar
-      v-model="snackbar.show"
-      :color="snackbar.color"
-      :timeout="4000"
-      bottom
-    >
+    <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="4000" bottom>
       {{ snackbar.text }}
       <template v-slot:action="{ attrs }">
         <v-btn text v-bind="attrs" @click="snackbar.show = false">
@@ -582,12 +512,12 @@ export default {
     },
 
     sortCandidatesByVotes(candidates) {
-      return [...candidates].sort((a, b) => b.votes - a.votes);
+      return [...candidates].sort((a, b) => (b.votes || 0) - (a.votes || 0));
     },
 
     calculatePercentage(votes) {
       if (this.totalVotes === 0) return "0.0";
-      return ((votes / this.totalVotes) * 100).toFixed(1);
+      return (((votes || 0) / this.totalVotes) * 100).toFixed(1);
     },
 
     getChartData(candidates) {
@@ -596,7 +526,7 @@ export default {
         labels: sortedCandidates.map((c) => c.studentName),
         datasets: [
           {
-            data: sortedCandidates.map((c) => c.votes),
+            data: sortedCandidates.map((c) => c.votes || 0),
             backgroundColor: sortedCandidates.map((c, index) =>
               this.getBarColor(index)
             ),
@@ -617,7 +547,7 @@ export default {
         candidate: candidate.studentName,
         studentName: candidate.studentName,
         imageUrl: candidate.imageUrl,
-        votes: candidate.votes,
+        votes: candidate.votes || 0,
         percentage: Number(this.calculatePercentage(candidate.votes)),
       }));
     },
@@ -663,11 +593,40 @@ export default {
       return "Winner Declared";
     },
 
+    async printResults() {
+      try {
+        const response = await this.$http.get(
+          `/vote/results/${this.electionId}/pdf`,
+          { responseType: 'blob' }
+        );
+
+        const blob = new Blob([response.data], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+
+        // Open in new tab
+        window.open(url, '_blank');
+
+        // Or download directly
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `election-results-${this.electionId}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+
+        this.showSnackbar('PDF generated successfully', 'success');
+      } catch (error) {
+        console.error('PDF generation error:', error);
+        this.showSnackbar('Failed to generate PDF', 'error');
+      }
+    },
+
     async exportResults(format) {
       this.exporting = format;
       try {
         const response = await this.$http.get(
-          `/votes/export/${this.electionId}?format=${format}`,
+          `/vote/export/${this.electionId}?format=${format}`,
           { responseType: "blob" }
         );
 
@@ -705,7 +664,6 @@ export default {
   },
 
   beforeDestroy() {
-    // Clean up any chart instances
     if (this.$refs.chart && this.$refs.chart.$data._chart) {
       this.$refs.chart.$data._chart.destroy();
     }
@@ -776,6 +734,7 @@ export default {
 .fade-leave-active {
   transition: opacity 0.3s;
 }
+
 .fade-enter,
 .fade-leave-to {
   opacity: 0;
@@ -784,9 +743,11 @@ export default {
 .slide-fade-enter-active {
   transition: all 0.3s ease;
 }
+
 .slide-fade-leave-active {
   transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
 }
+
 .slide-fade-enter,
 .slide-fade-leave-to {
   transform: translateX(10px);

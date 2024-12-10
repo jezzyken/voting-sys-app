@@ -12,6 +12,8 @@ const register = async (username, password) => {
 
 const login = async (username, password) => {
     const user = await User.findOne({ username });
+
+    console.log({username, password})
     
     if (!user || !(await user.correctPassword(password))) {
       throw new Error("Incorrect username or password");

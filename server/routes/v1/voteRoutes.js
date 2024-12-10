@@ -4,6 +4,8 @@ const Vote = require("../../models/voteModel");
 const Election = require("../../models/electionModel");
 const Candidate = require("../../models/candidateModel");
 const ObjectId = require("mongoose").Types.ObjectId;
+const PDFDocument = require("pdfkit");
+const moment = require("moment");
 
 router.post("/", async (req, res) => {
   try {
@@ -110,7 +112,34 @@ router.get("/results/:electionId", async (req, res) => {
       });
     }
 
-    const results = await Vote.aggregate([
+    const allCandidates = await Candidate.aggregate([
+      { $match: { electionId: new ObjectId(electionId) } },
+      {
+        $lookup: {
+          from: "students",
+          localField: "studentId",
+          foreignField: "_id",
+          as: "student",
+        },
+      },
+      {
+        $project: {
+          position: 1,
+          imageUrl: 1,
+          studentName: {
+            $concat: [
+              { $arrayElemAt: ["$student.firstName", 0] },
+              " ",
+              { $arrayElemAt: ["$student.middleName", 0] },
+              " ",
+              { $arrayElemAt: ["$student.lastName", 0] },
+            ],
+          },
+        },
+      },
+    ]);
+
+    const voteCounts = await Vote.aggregate([
       { $match: { electionId: new ObjectId(electionId) } },
       { $unwind: "$votes" },
       {
@@ -119,43 +148,28 @@ router.get("/results/:electionId", async (req, res) => {
             position: "$votes.position",
             candidateId: "$votes.candidateId",
           },
-          count: { $sum: 1 },
-        },
-      },
-      {
-        $lookup: {
-          from: "candidates",
-          localField: "_id.candidateId",
-          foreignField: "_id",
-          as: "candidate",
-        },
-      },
-      {
-        $lookup: {
-          from: "students",
-          localField: "candidate.studentId",
-          foreignField: "_id",
-          as: "student",
-        },
-      },
-      {
-        $project: {
-          position: "$_id.position",
-          candidateId: "$_id.candidateId",
-          votes: "$count",
-          "candidate.imageUrl": 1,
-          "student.firstName": 1,
-          "student.middleName": 1,
-          "student.lastName": 1,
-        },
-      },
-      {
-        $sort: {
-          position: 1,
-          votes: -1,
+          votes: { $sum: 1 },
         },
       },
     ]);
+
+    const voteMap = new Map(
+      voteCounts.map((count) => [
+        count._id.candidateId.toString(),
+        {
+          position: count._id.position,
+          votes: count.votes,
+        },
+      ])
+    );
+
+    const results = allCandidates.map((candidate) => ({
+      candidateId: candidate._id,
+      position: candidate.position,
+      votes: voteMap.get(candidate._id.toString())?.votes || 0,
+      imageUrl: candidate.imageUrl,
+      studentName: candidate.studentName,
+    }));
 
     const groupedResults = results.reduce((acc, result) => {
       const position = result.position;
@@ -165,13 +179,15 @@ router.get("/results/:electionId", async (req, res) => {
       acc[position].push({
         candidateId: result.candidateId,
         votes: result.votes,
-        imageUrl: result.candidate[0]?.imageUrl,
-        studentName: result.student[0]
-          ? `${result.student[0].firstName} ${result.student[0].middleName} ${result.student[0].lastName}`
-          : "Unknown",
+        imageUrl: result.imageUrl,
+        studentName: result.studentName,
       });
       return acc;
     }, {});
+
+    Object.keys(groupedResults).forEach((position) => {
+      groupedResults[position].sort((a, b) => b.votes - a.votes);
+    });
 
     res.json({
       success: true,
@@ -314,6 +330,180 @@ router.get("/results/:electionId/demographics", async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error fetching demographics data",
+    });
+  }
+});
+
+router.get("/results/:electionId/pdf", async (req, res) => {
+  console.log("pdf");
+  try {
+    const { electionId } = req.params;
+
+    const election = await Election.findById(electionId);
+    if (!election) {
+      return res.status(404).json({
+        success: false,
+        message: "Election not found",
+      });
+    }
+
+    const allCandidates = await Candidate.aggregate([
+      { $match: { electionId: new ObjectId(electionId) } },
+      {
+        $lookup: {
+          from: "students",
+          localField: "studentId",
+          foreignField: "_id",
+          as: "student",
+        },
+      },
+      {
+        $project: {
+          position: 1,
+          imageUrl: 1,
+          studentName: {
+            $concat: [
+              { $arrayElemAt: ["$student.firstName", 0] },
+              " ",
+              { $arrayElemAt: ["$student.middleName", 0] },
+              " ",
+              { $arrayElemAt: ["$student.lastName", 0] },
+            ],
+          },
+        },
+      },
+      {
+        $sort: { position: 1 },
+      },
+    ]);
+
+    const voteCounts = await Vote.aggregate([
+      { $match: { electionId: new ObjectId(electionId) } },
+      { $unwind: "$votes" },
+      {
+        $group: {
+          _id: {
+            position: "$votes.position",
+            candidateId: "$votes.candidateId",
+          },
+          votes: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const voteMap = new Map(
+      voteCounts.map((count) => [
+        count._id.candidateId.toString(),
+        {
+          position: count._id.position,
+          votes: count.votes,
+        },
+      ])
+    );
+
+    const doc = new PDFDocument({
+      size: "A4",
+      margins: {
+        top: 36,
+        bottom: 36,
+        left: 36,
+        right: 36,
+      },
+    });
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=election-results-${electionId}.pdf`
+    );
+    doc.pipe(res);
+
+    doc
+      .fontSize(16)
+      .font("Helvetica-Bold")
+      .text("ELECTION RESULTS", { align: "center" })
+      .moveDown(0.5);
+
+    doc
+      .rect(36, doc.y, doc.page.width - 72, 65)
+      .stroke()
+      .fontSize(9)
+      .font("Helvetica")
+      .text(`Election Name: ${election.name}`, 46, doc.y + 10)
+      .text(`Election Type: ${election.electionType}`)
+      .text(`Start Date: ${moment(election.startDate).format("MMMM D, YYYY")}`)
+      .text(`End Date: ${moment(election.endDate).format("MMMM D, YYYY")}`)
+      .text(`Status: ${election.status.toUpperCase()}`)
+      .moveDown(1);
+
+    const groupedCandidates = allCandidates.reduce((acc, candidate) => {
+      if (!acc[candidate.position]) {
+        acc[candidate.position] = [];
+      }
+      acc[candidate.position].push({
+        ...candidate,
+        votes: voteMap.get(candidate._id.toString())?.votes || 0,
+      });
+      return acc;
+    }, {});
+
+    const sortedPositions = Object.keys(groupedCandidates).sort();
+
+    sortedPositions.forEach((position) => {
+      const candidates = groupedCandidates[position];
+      candidates.sort((a, b) => b.votes - a.votes);
+      const totalVotes = candidates.reduce((sum, c) => sum + c.votes, 0);
+
+      doc
+        .fontSize(12)
+        .font("Helvetica-Bold")
+        .fillColor("#000")
+        .text(position.toUpperCase(), { align: "left" })
+        .moveDown(0.3);
+
+      const tableTop = doc.y;
+      const rowHeight = 20;
+
+      doc.rect(36, tableTop, doc.page.width - 72, rowHeight).fill("#f0f0f0");
+
+      doc
+        .fontSize(8)
+        .font("Helvetica-Bold")
+        .fillColor("#000")
+        .text("RANK", 46, tableTop + 6)
+        .text("CANDIDATE NAME", 86, tableTop + 6)
+        .text("VOTES", 336, tableTop + 6)
+        .text("PERCENTAGE", 436, tableTop + 6);
+
+      candidates.forEach((candidate, index) => {
+        const y = tableTop + rowHeight + index * rowHeight;
+        const percentage =
+          totalVotes > 0
+            ? ((candidate.votes / totalVotes) * 100).toFixed(2)
+            : "0.00";
+
+        if (index === 0 && candidate.votes > 0) {
+          doc.rect(36, y, doc.page.width - 72, rowHeight).fill("#e8f5e9");
+        }
+
+        doc
+          .fontSize(8)
+          .font("Helvetica")
+          .fillColor("#000")
+          .text(`${index + 1}`, 46, y + 6)
+          .text(candidate.studentName, 86, y + 6)
+          .text(candidate.votes.toString(), 336, y + 6)
+          .text(`${percentage}%`, 436, y + 6);
+      });
+
+      doc.moveDown(1.5);
+    });
+    doc.end();
+  } catch (error) {
+    console.error("PDF generation error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error generating PDF report",
     });
   }
 });

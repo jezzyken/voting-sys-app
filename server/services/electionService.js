@@ -1,6 +1,54 @@
 const MODEL = require("../models/electionModel");
+const SIUDENT_MODEL = require("../models/studentModel");
+const VOTE_MODEL = require("../models/studentModel");
+const moment = require('moment');
+require('moment-timezone');
+moment.tz.setDefault('Asia/Singapore');
+
+async function checkAndUpdateElectionStatus() {
+  try {
+    const currentDate = moment().tz('Asia/Singapore');
+    
+    const ongoingElections = await MODEL.find({ status: "ongoing" });
+
+    for (const election of ongoingElections) {
+      let shouldComplete = false;
+
+      if (moment(election.endDate).isBefore(currentDate)) {
+        shouldComplete = true;
+      } else {
+        const totalEligibleVoters = await SIUDENT_MODEL.countDocuments({
+          status: "active",
+          ...(election.electionType === "Classroom" 
+            ? { classroomId: election.classroomId } 
+            : {})
+        });
+
+        const totalVotes = await VOTE_MODEL.countDocuments({
+          electionId: election._id
+        });
+
+        if (totalVotes >= totalEligibleVoters && totalEligibleVoters > 0) {
+          shouldComplete = true;
+        }
+      }
+
+      if (shouldComplete) {
+        await MODEL.findByIdAndUpdate(
+          election._id,
+          { status: "completed" },
+          { new: true }
+        );
+        console.log(`Election ${election.name} marked as completed`);
+      }
+    }
+  } catch (error) {
+    console.error("Error checking election status:", error);
+  }
+}
 
 const getAll = async () => {
+  await checkAndUpdateElectionStatus()
   return await MODEL.find().sort({ _id: -1 });
 };
 

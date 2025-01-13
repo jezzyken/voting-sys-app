@@ -10,6 +10,8 @@ const moment = require('moment');
 require('moment-timezone');
 moment.tz.setDefault('Asia/Singapore');
 
+
+
 router.get("/statistics", async (req, res) => {
   try {
     // Get current ongoing election

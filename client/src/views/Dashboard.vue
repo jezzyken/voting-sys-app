@@ -196,10 +196,26 @@
                     v-on="on"
                     @click="viewElectionResults(item)"
                   >
-                    <v-icon>mdi-poll</v-icon>
+                    <v-icon>mdi-chart-bar</v-icon>
                   </v-btn>
                 </template>
-                <span>View Results</span>
+                <span>View Final Results</span>
+              </v-tooltip>
+
+              <v-tooltip bottom v-if="item.status !== 'completed'">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    small
+                    icon
+                    color="primary"
+                    v-bind="attrs"
+                    v-on="on"
+                    @click="viewPartiaResults(item)"
+                  >
+                    <v-icon>mdi-chart-timeline-variant</v-icon>
+                  </v-btn>
+                </template>
+                <span>View Partial Results</span>
               </v-tooltip>
             </template>
 
@@ -474,6 +490,9 @@ export default {
 
     viewElectionResults(item) {
       this.$router.push(`/election/results/${item.id}/view`);
+    },
+    viewPartiaResults(item) {
+      this.$router.push(`/election/${item.id}/partial-results`);
     },
   },
 

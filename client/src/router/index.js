@@ -88,6 +88,11 @@ const routes = [
         component: () => import('@/views/ElectionResults.vue')
       },
       {
+        path: '/election/:id/partial-results',
+        name: 'PartialResults',
+        component: () => import('@/views/PartialResults.vue')
+      },
+      {
         path: "/reports",
         name: "reports",
         component: () => import('@/views/VotingReport.vue')
@@ -103,8 +108,18 @@ const routes = [
         name: "Landing Page",
         component: () => import("../views/ElectionLandingPage.vue"),
       },
+      {
+        path: "partial-results/:id", 
+        name: "View Partial Landing",
+        component: () => import("@/views/PartialResults.vue"),
+      },
+      {
+        path: "results/:id", 
+        name: "View Results Landing", 
+        component: () => import("@/views/ElectionResults.vue"),
+      }
     ],
-  },
+},
   {
     path: "/portal/login",
     component: FullPageLayout,

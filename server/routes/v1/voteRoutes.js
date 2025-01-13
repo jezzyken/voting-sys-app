@@ -202,6 +202,116 @@ router.get("/results/:electionId", async (req, res) => {
   }
 });
 
+router.get("/partial-results/:electionId", async (req, res) => {
+  try {
+    const { electionId } = req.params;
+
+    const election = await Election.findById(electionId);
+    if (!election) {
+      return res.status(404).json({
+        success: false,
+        message: "Election not found"
+      });
+    }
+
+    if (election.status !== "ongoing") {
+      return res.status(400).json({
+        success: false,
+        message: "Partial results are only available for ongoing elections"
+      });
+    }
+
+    const voteCounts = await Vote.aggregate([
+      { $match: { electionId: new ObjectId(electionId) } },
+      { $unwind: "$votes" },
+      {
+        $group: {
+          _id: {
+            position: "$votes.position",
+            candidateId: "$votes.candidateId"
+          },
+          votes: { $sum: 1 }
+        }
+      }
+    ]);
+
+    const allCandidates = await Candidate.aggregate([
+      { $match: { electionId: new ObjectId(electionId) } },
+      {
+        $lookup: {
+          from: "students",
+          localField: "studentId",
+          foreignField: "_id",
+          as: "student"
+        }
+      },
+      {
+        $project: {
+          position: 1,
+          imageUrl: 1,
+          studentName: {
+            $concat: [
+              { $arrayElemAt: ["$student.firstName", 0] },
+              " ",
+              { $arrayElemAt: ["$student.middleName", 0] },
+              " ",
+              { $arrayElemAt: ["$student.lastName", 0] }
+            ]
+          }
+        }
+      }
+    ]);
+
+    const voteMap = new Map(
+      voteCounts.map(count => [
+        count._id.candidateId.toString(),
+        {
+          position: count._id.position,
+          votes: count.votes
+        }
+      ])
+    );
+
+    const results = allCandidates.map(candidate => ({
+      candidateId: candidate._id,
+      position: candidate.position,
+      votes: voteMap.get(candidate._id.toString())?.votes || 0,
+      studentName: candidate.studentName,
+      imageUrl: candidate.imageUrl 
+    }));
+
+    const groupedResults = results.reduce((acc, result) => {
+      const position = result.position;
+      if (!acc[position]) {
+        acc[position] = [];
+      }
+      acc[position].push(result);
+      return acc;
+    }, {});
+
+
+    Object.keys(groupedResults).forEach(position => {
+      groupedResults[position].sort((a, b) => b.votes - a.votes);
+    });
+
+    const totalVotesCast = await Vote.countDocuments({ electionId });
+
+    res.json({
+      success: true,
+      data: {
+        results: groupedResults,
+        totalVotesCast
+      }
+    });
+  } catch (error) {
+    console.error("Partial results fetch error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching partial election results"
+    });
+  }
+});
+
 router.get("/results/:electionId/demographics", async (req, res) => {
   try {
     const { electionId } = req.params;
@@ -507,5 +617,7 @@ router.get("/results/:electionId/pdf", async (req, res) => {
     });
   }
 });
+
+
 
 module.exports = router;

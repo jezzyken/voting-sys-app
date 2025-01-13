@@ -7,6 +7,7 @@ export default {
   name: "App",
 
   async created() {
+    console.log("im always called")
     await this.checkElectionStatus();
   },
 
@@ -20,14 +21,14 @@ export default {
     },
   },
 
-  mounted() {
-    this.intervalId = setInterval(this.checkElectionStatus, 60000);
-  },
+  // mounted() {
+  //   this.intervalId = setInterval(this.checkElectionStatus, 60000);
+  // },
 
-  beforeDestroy() {
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
-    }
-  },
+  // beforeDestroy() {
+  //   if (this.intervalId) {
+  //     clearInterval(this.intervalId);
+  //   }
+  // },
 };
 </script>

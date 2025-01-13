@@ -498,7 +498,7 @@ export default {
 
   mounted() {
     this.fetchDashboardData();
-    this.refreshInterval = setInterval(this.fetchDashboardData, 60000);
+    // this.refreshInterval = setInterval(this.fetchDashboardData, 60000);
   },
   beforeDestroy() {
     if (this.refreshInterval) {

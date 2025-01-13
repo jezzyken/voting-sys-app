@@ -6,6 +6,10 @@ const Student = require("../../models/studentModel");
 const Candidate = require("../../models/candidateModel");
 const Vote = require("../../models/voteModel");
 
+const moment = require('moment');
+require('moment-timezone');
+moment.tz.setDefault('Asia/Singapore');
+
 router.get("/statistics", async (req, res) => {
   try {
     // Get current ongoing election
@@ -60,33 +64,28 @@ router.get("/statistics", async (req, res) => {
 
 router.get("/voting-trends", async (req, res) => {
   try {
-    // Find current ongoing election
     const currentElection = await Election.findOne({ status: "ongoing" });
-
     if (!currentElection) {
       return res.json([]);
     }
 
-    // Get start date of the election
-    const startDate = new Date(currentElection.startDate);
-    const endDate = new Date();
+    const endDate = moment().tz('Asia/Singapore').toDate();
+    const startDate = moment().tz('Asia/Singapore').subtract(30, 'minutes').toDate();
 
     const votingTrends = await Vote.aggregate([
       {
         $match: {
           electionId: currentElection._id,
-          createdAt: {
-            $gte: startDate,
-            $lte: endDate,
-          },
+          createdAt: { $gte: startDate, $lte: endDate },
         },
       },
       {
         $group: {
           _id: {
             $dateToString: {
-              format: "%Y-%m-%d",
+              format: "%Y-%m-%d %H:%M",
               date: "$createdAt",
+              timezone: "Asia/Singapore"
             },
           },
           count: { $sum: 1 },
@@ -97,12 +96,13 @@ router.get("/voting-trends", async (req, res) => {
       },
     ]);
 
-    // Fill in missing dates with zero votes
+    // Fill in missing minutes with zero votes
     const filledTrends = [];
-    const currentDate = new Date(startDate);
+    let currentDate = moment(startDate).tz('Asia/Singapore');
+    const momentEndDate = moment(endDate).tz('Asia/Singapore');
 
-    while (currentDate <= endDate) {
-      const dateStr = currentDate.toISOString().split("T")[0];
+    while (currentDate <= momentEndDate) {
+      const dateStr = currentDate.format('YYYY-MM-DD HH:mm');
       const existingTrend = votingTrends.find((trend) => trend._id === dateStr);
 
       filledTrends.push({
@@ -110,7 +110,7 @@ router.get("/voting-trends", async (req, res) => {
         count: existingTrend ? existingTrend.count : 0,
       });
 
-      currentDate.setDate(currentDate.getDate() + 1);
+      currentDate = currentDate.add(1, 'minutes');
     }
 
     res.json({

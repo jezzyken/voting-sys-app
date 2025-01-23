@@ -16,13 +16,41 @@
           rounded
           style="max-width: 300px"
         ></v-text-field>
+
         <v-btn color="primary" @click="openCreateDialog">
           <v-icon left>mdi-plus</v-icon>
           Add New Student
         </v-btn>
       </v-card-title>
 
+      <!-- <v-btn
+        color="error"
+        :disabled="!selectedStudents.length"
+        @click="openDeleteAllDialog"
+        class="mb-2"
+      >
+        Delete Selected
+      </v-btn> -->
+
+      <v-dialog v-model="deleteAllDialog" max-width="500px">
+        <v-card>
+          <v-card-title>Delete Selected Students</v-card-title>
+          <v-card-text
+            >Delete {{ selectedStudents.length }} selected
+            students?</v-card-text
+          >
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn text @click="deleteAllDialog = false">Cancel</v-btn>
+            <v-btn color="error" @click="deleteSelectedStudents"
+              >Delete All</v-btn
+            >
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
       <v-data-table
+        v-model="selectedStudents"
         :headers="headers"
         :items="students"
         :search="search"
@@ -31,7 +59,27 @@
         :loading="loading"
         loading-text="Loading students... Please wait"
         no-data-text="No students found"
+        show-select
+        item-key="_id"
       >
+        <template v-slot:top>
+          <v-btn
+            color="error"
+            :disabled="!selectedStudents.length"
+            @click="openDeleteAllDialog"
+            class="ma-2"
+          >
+            <v-icon left>mdi-delete</v-icon>
+            Delete Selected ({{ selectedStudents.length }})
+          </v-btn>
+        </template>
+
+        <template v-slot:header.data-table-select>
+          <v-checkbox
+            v-model="selectAll"
+            @change="selectAllStudents"
+          ></v-checkbox>
+        </template>
         <template v-slot:item.status="{ item }">
           <v-chip
             :color="item.status === 'active' ? 'green' : 'red'"
@@ -215,7 +263,6 @@
 <script>
 import { mask } from "vue-the-mask";
 
-
 export default {
   name: "StudentManagementPage",
   directives: {
@@ -276,11 +323,15 @@ export default {
       status: "active",
     },
     showPassword: false,
-    displayPhoneNo: '', 
+    displayPhoneNo: "",
     phoneRules: {
-      required: v => !!v || 'Phone number is required',
-      format: v => /^\+63 \d{3}-\d{3}-\d{4}$/.test(v) || 'Invalid phone number format'
+      required: (v) => !!v || "Phone number is required",
+      format: (v) =>
+        /^\+63 \d{3}-\d{3}-\d{4}$/.test(v) || "Invalid phone number format",
     },
+    selectAll: false,
+    selectedStudents: [],
+    deleteAllDialog: false,
   }),
 
   computed: {
@@ -300,9 +351,9 @@ export default {
       this.loading = true;
       try {
         const response = await this.$http.get("/student");
-        this.students = response.data.data.items.map(student => ({
+        this.students = response.data.data.items.map((student) => ({
           ...student,
-          displayPhoneNo: this.formatPhoneForDisplay(student.phoneNo)
+          displayPhoneNo: this.formatPhoneForDisplay(student.phoneNo),
         }));
       } catch (error) {
         console.error("Error fetching students:", error);
@@ -340,22 +391,26 @@ export default {
     },
 
     formatPhoneForDisplay(phoneNo) {
-      if (!phoneNo) return '';
-      return phoneNo.replace(/(\+63)(\d{3})(\d{3})(\d{4})/, '$1 $2-$3-$4');
+      if (!phoneNo) return "";
+      return phoneNo.replace(/(\+63)(\d{3})(\d{3})(\d{4})/, "$1 $2-$3-$4");
     },
 
     handlePhoneInput(value) {
       if (!value) return;
-      if (!value.startsWith('+63 ')) {
-        this.displayPhoneNo = '+63 ' + value.replace(/^\+63\s?/, '');
+      if (!value.startsWith("+63 ")) {
+        this.displayPhoneNo = "+63 " + value.replace(/^\+63\s?/, "");
       }
-      this.editedItem.phoneNo = value.replace(/[\s-]/g, '');
+      this.editedItem.phoneNo = value.replace(/[\s-]/g, "");
+    },
+
+    selectAllStudents(value) {
+      this.selectedStudents = value ? [...this.students] : [];
     },
 
     openCreateDialog() {
       this.editedIndex = -1;
       this.editedItem = Object.assign({}, this.defaultItem);
-      this.displayPhoneNo = ''
+      this.displayPhoneNo = "";
       this.dialog = true;
     },
 
@@ -371,10 +426,14 @@ export default {
       this.deleteDialog = true;
     },
 
+    openDeleteAllDialog() {
+      this.deleteAllDialog = true;
+    },
+
     closeDialog() {
       this.showPassword = false;
       this.dialog = false;
-      this.displayPhoneNo = '';
+      this.displayPhoneNo = "";
       this.$nextTick(() => {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
@@ -391,7 +450,7 @@ export default {
       try {
         const studentData = {
           ...this.editedItem,
-          phoneNo: this.editedItem.phoneNo.replace(/[\s-]/g, '')
+          phoneNo: this.editedItem.phoneNo.replace(/[\s-]/g, ""),
         };
 
         if (this.editedIndex > -1) {
@@ -413,7 +472,9 @@ export default {
 
     async deleteStudent() {
       try {
-        await this.$http.delete(`/student/${this.editedItem._id}`);
+        const ids = [this.editedItem._id];
+        await this.$http.delete("/student", { data: { ids } });
+
         const index = this.students.findIndex(
           (student) => student._id === this.editedItem._id
         );
@@ -423,6 +484,40 @@ export default {
       } catch (error) {
         console.error("Error deleting student:", error);
         this.showSnackbar("Error deleting student", "error");
+      }
+    },
+
+    async deleteSelectedStudents() {
+      try {
+        const ids = this.selectedStudents.map((student) => student._id);
+        await this.$http.delete("/student", { data: { ids } });
+
+        this.students = this.students.filter(
+          (student) => !this.selectedStudents.includes(student)
+        );
+        this.selectedStudents = [];
+        this.deleteAllDialog = false;
+        this.showSnackbar("Students deleted successfully", "success");
+      } catch (error) {
+        console.error("Error deleting students:", error);
+        this.showSnackbar("Error deleting students", "error");
+      }
+    },
+
+    async deleteSelectedStudents() {
+      try {
+        const ids = this.selectedStudents.map((student) => student._id);
+        await this.$http.delete("/student", { data: { ids } });
+
+        this.students = this.students.filter(
+          (student) => !this.selectedStudents.includes(student)
+        );
+        this.selectedStudents = [];
+        this.deleteAllDialog = false;
+        this.showSnackbar("Students deleted successfully", "success");
+      } catch (error) {
+        console.error("Error deleting students:", error);
+        this.showSnackbar("Error deleting students", "error");
       }
     },
 

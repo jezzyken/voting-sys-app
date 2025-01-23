@@ -54,10 +54,13 @@ const update = catchAsync(async (req, res, next) => {
 });
 
 const remove = catchAsync(async (req, res, next) => {
-  const deletedItem = await SERVICE.remove(req.params.id);
-  if (!deletedItem) {
-    return next(new AppError("Student not found", 404));
+  const { ids } = req.body; 
+  const deletedItems = await SERVICE.remove(ids);
+  
+  if (!deletedItems) {
+    return next(new AppError("Students not found", 404));
   }
+  
   res.status(204).json({
     status: "success",
     data: null,

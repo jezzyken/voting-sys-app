@@ -30,8 +30,26 @@ const studentSchema = new mongoose.Schema(
       default: "email",
     },
     password: { type: String },
+    isDeleted: { type: Boolean, default: false },
+    deletedAt: { type: Date, default: null },
   },
   { timestamps: true }
+);
+
+studentSchema.statics.softDeleteMany = async function (ids) {
+  return await this.updateMany(
+    { _id: { $in: ids } },
+    { status: "inactive", deletedAt: new Date() }
+  );
+ };
+
+studentSchema.pre(
+  ["find", "findOne", "findOneAndUpdate", "count", "countDocuments"],
+  function () {
+    if (!this.getQuery().includeInactive) {
+      this.where({ status: "active" });
+    }
+  }
 );
 
 function generateRandomPassword(length = 8) {

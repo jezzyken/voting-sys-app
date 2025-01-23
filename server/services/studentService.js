@@ -1,9 +1,11 @@
 const MODEL = require("../models/studentModel");
 const { generateOTP, sendOTPEmail } = require("../utils/otpUtils");
 const axios = require("axios");
+const mongoose = require("mongoose");
 
 const getAll = async () => {
   return await MODEL.find()
+    .where({ status: "active" })
     .populate("programId")
     .populate("classroomId")
     .sort({ _id: -1 });
@@ -25,8 +27,19 @@ const update = async (id, data) => {
   return await MODEL.findByIdAndUpdate(id, data, { new: true });
 };
 
-const remove = async (id) => {
-  return await MODEL.findByIdAndDelete(id);
+const remove = async (ids) => {
+  try {
+    if (!Array.isArray(ids)) return;
+    const objectIds = ids.map((id) => new mongoose.Types.ObjectId(id));
+    return await MODEL.updateMany(
+      { _id: { $in: objectIds } },
+      { status: "inactive" },
+      { new: true }
+    );
+  } catch (error) {
+    console.error("Error in remove:", error);
+    throw new Error("Failed to remove students");
+  }
 };
 
 const search = async (req) => {
